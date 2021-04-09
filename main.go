@@ -127,6 +127,7 @@ func InsertData(book Book) error {
 	return nil
 }
 
+// SelectData - cRud
 func SelectData(db *sql.DB, search Book) ([]Book, error) {
 	sql := ""
 
