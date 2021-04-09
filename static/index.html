@@ -1,0 +1,70 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <script src="/js/vue.min.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <h1>Bookshelf</h1>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>순번</th>
+                    <th>책이름</th>
+                    <th>저자</th>
+                    <th>가격</th>
+                    <th>할인가</th>
+                    <th>화폐단위</th>
+                    <th>판본</th>
+                    <th>출판사</th>
+                    <th>ISBN</th>
+                </tr>
+            </thead>
+            <tbody>
+                <template v-for="(b, i) in books">
+                    <tr>
+                        <td>{{i+1}}/{{b.idx}}</td>
+                        <td>{{b.name}}</td>
+                        <td>{{b.author}}</td>
+                        <td>{{b.price}}</td>
+                        <td>{{b["sale-price"]}}</td>
+                        <td>{{b["price-unit"]}}</td>
+                        <td>{{b.edition}}</td>
+                        <td>{{b.publisher}}</td>
+                        <td>{{b.isbn}}</td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </div>
+</body>
+
+<script>
+    const vm = new Vue({
+        el: "#app",
+        data: {
+            restURI: "/books",
+            books: [{
+                idx: 99,
+                name: "테스트이름",
+                author: "작가님",
+                price: 12345,
+            }]
+        },
+        mounted() {
+            this.initData()
+        },
+        methods: {
+            async initData() {
+                let response = await fetch(this.restURI, { method: "GET" })
+                if (response.ok) { this.books = await response.json() }
+            }
+        }
+    })
+</script>
+
+</html>
