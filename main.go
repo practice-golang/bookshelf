@@ -8,18 +8,21 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/doug-martin/goqu/v9"
 	_ "modernc.org/sqlite"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+
+	"gopkg.in/guregu/null.v4"
 )
 
 type Book struct {
-	IDX    int64   `json:"idx"`
-	Name   string  `json:"name"`
-	Price  float64 `json:"price"`
-	Author string  `json:"author"`
-	ISBN   string  `json:"isbn"`
+	Idx    null.String `json:"idx" db:"IDX"`
+	Name   null.String `json:"name" db:"NAME"`
+	Price  null.Float  `json:"price" db:"PRICE"`
+	Author null.String `json:"author" db:"AUTHOR"`
+	ISBN   null.String `json:"isbn" db:"ISBN"`
 }
 
 var (
@@ -32,16 +35,16 @@ var (
 
 var booksDummy = []Book{
 	{
-		Name:   "흔한남매 7",
-		Price:  10800,
-		Author: "백난도",
-		ISBN:   "9791164137527",
+		Name:   null.NewString("흔한남매 7", true),
+		Price:  null.NewFloat(10800, true),
+		Author: null.NewString("백난도", true),
+		ISBN:   null.NewString("9791164137527", true),
 	},
 	{
-		Name:   "성장의 종말",
-		Price:  17000,
-		Author: "디트리히 볼래스",
-		ISBN:   "9791165215170",
+		Name:   null.NewString("성장의 종말", true),
+		Price:  null.NewFloat(17000, true),
+		Author: null.NewString("디트리히 볼래스", true),
+		ISBN:   null.NewString("9791165215170", true),
 	},
 }
 
@@ -88,16 +91,40 @@ func InsertData(book Book) error {
 	sql := ""
 
 	sql += `
+	INSERT INTO "#TABLE_NAME"
+		(NAME, PRICE, AUTHOR, ISBN)
+	VAlUES("#BOOK_NAME", #PRICE_NORMAL, "#AUTHOR", #ISBN);`
+
+	sql = strings.ReplaceAll(sql, "#TABLE_NAME", tableName)
+
+	sql = strings.ReplaceAll(sql, "#BOOK_NAME", book.Name.String)
+	sql = strings.ReplaceAll(sql, "#PRICE_NORMAL", fmt.Sprint(book.Price.Float64))
+	sql = strings.ReplaceAll(sql, "#AUTHOR", book.Author.String)
+	sql = strings.ReplaceAll(sql, "#ISBN", book.ISBN.String)
+
+	_, err := db.Exec(sql)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// InsertReplaceData - Crud
+func InsertReplaceData(book Book) error {
+	sql := ""
+
+	sql += `
 	INSERT OR REPLACE INTO "#TABLE_NAME"
 		(NAME, PRICE, AUTHOR, ISBN)
 	VAlUES("#BOOK_NAME", #PRICE_NORMAL, "#AUTHOR", #ISBN);`
 
 	sql = strings.ReplaceAll(sql, "#TABLE_NAME", tableName)
 
-	sql = strings.ReplaceAll(sql, "#BOOK_NAME", book.Name)
-	sql = strings.ReplaceAll(sql, "#PRICE_NORMAL", fmt.Sprint(book.Price))
-	sql = strings.ReplaceAll(sql, "#AUTHOR", book.Author)
-	sql = strings.ReplaceAll(sql, "#ISBN", book.ISBN)
+	sql = strings.ReplaceAll(sql, "#BOOK_NAME", book.Name.String)
+	sql = strings.ReplaceAll(sql, "#PRICE_NORMAL", fmt.Sprint(book.Price.Float64))
+	sql = strings.ReplaceAll(sql, "#AUTHOR", book.Author.String)
+	sql = strings.ReplaceAll(sql, "#ISBN", book.ISBN.String)
 
 	_, err := db.Exec(sql)
 	if err != nil {
@@ -108,33 +135,15 @@ func InsertData(book Book) error {
 }
 
 // SelectData - cRud
-func SelectData(db *sql.DB, search Book) ([]Book, error) {
-	sql := ""
+func SelectData(search Book) ([]Book, error) {
+	var result []Book
 
-	sql += `
-	SELECT
-		IDX, NAME, PRICE, AUTHOR, ISBN
-	FROM #TABLE_NAME
-	`
-
-	sql = strings.ReplaceAll(sql, "#TABLE_NAME", tableName)
-
-	rows, err := db.Query(sql)
+	dbms := goqu.New("sqlite3", db)
+	ds := dbms.From(tableName).Select(&Book{})
+	err := ds.ScanStructs(&result)
 	if err != nil {
+		log.Println("ds: ", err.Error())
 		return nil, err
-	}
-
-	result := []Book{}
-
-	for rows.Next() {
-		var b Book
-
-		err = rows.Scan(&b.IDX, &b.Name, &b.Price, &b.Author, &b.ISBN)
-		if err != nil {
-			return nil, err
-		}
-
-		result = append(result, b)
 	}
 
 	return result, nil
@@ -142,7 +151,7 @@ func SelectData(db *sql.DB, search Book) ([]Book, error) {
 
 // GetBooks - 책정보 취득
 func GetBooks(c echo.Context) error {
-	data, err := SelectData(db, Book{})
+	data, err := SelectData(Book{})
 	if err != nil {
 		log.Fatal("SelectData: ", err)
 	}
@@ -154,25 +163,21 @@ func GetBooks(c echo.Context) error {
 	return c.JSON(http.StatusOK, data)
 }
 
-func serverSetup() *echo.Echo {
-	e := echo.New()
-	e.HideBanner = true
+// SetDummy - 더미데이터 입력
+func SetDummy(c echo.Context) error {
+	var err error
+	for _, book := range booksDummy {
+		err = InsertData(book)
+		if err != nil {
+			log.Println("InsertData: ", err)
+			return c.JSON(http.StatusConflict, map[string]string{"msg": err.Error()})
+		}
+	}
 
-	e.Use(
-		middleware.CORS(),
-		middleware.Recover(),
-	)
-
-	contentHandler := echo.WrapHandler(http.FileServer(http.FS(content)))
-	contentRewrite := middleware.Rewrite(map[string]string{"/*": "/static/$1"})
-
-	e.GET("/*", contentHandler, contentRewrite)
-	e.GET("/books", GetBooks)
-
-	return e
+	return c.JSON(http.StatusOK, "OK")
 }
 
-func main() {
+func setupDB() error {
 	var err error
 
 	db, err = InitDB()
@@ -186,13 +191,34 @@ func main() {
 		log.Fatal("CreateTable: ", err)
 	}
 
-	for _, book := range booksDummy {
-		err = InsertData(book)
-		if err != nil {
-			log.Fatal("InsertData: ", err)
-		}
+	return err
+}
+
+func setupServer() *echo.Echo {
+	e := echo.New()
+	e.HideBanner = true
+
+	e.Use(
+		middleware.CORS(),
+		middleware.Recover(),
+	)
+
+	contentHandler := echo.WrapHandler(http.FileServer(http.FS(content)))
+	contentRewrite := middleware.Rewrite(map[string]string{"/*": "/static/$1"})
+
+	e.GET("/*", contentHandler, contentRewrite)
+	e.GET("/books", GetBooks)
+	e.PUT("/books/dummy", SetDummy)
+
+	return e
+}
+
+func main() {
+	err := setupDB()
+	if err != nil {
+		log.Fatal("Setup DB: ", err)
 	}
 
-	e := serverSetup()
+	e := setupServer()
 	e.Logger.Fatal(e.Start("127.0.0.1:2918"))
 }

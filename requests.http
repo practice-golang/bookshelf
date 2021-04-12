@@ -22,6 +22,17 @@ content-type: application/json
     }
 }
 
+### Add dummy
+PUT {{uri}}/books/dummy HTTP/1.1
+
+{
+    "name": "2020 추천도서목록",
+    "price": "27000",
+    "author": "(주)학교도서관저널",
+    "isbn": "1122334455667"
+}
+
+
 ### Add book
 PUT {{uri}}/books HTTP/1.1
 
