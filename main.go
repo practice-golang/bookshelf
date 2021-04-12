@@ -26,7 +26,7 @@ var (
 	dbFileName = "./data.db"
 	tableName  = "BOOKSHELF"
 	db         *sql.DB
-	//go:embed static/*
+	//go:embed static
 	content embed.FS
 )
 

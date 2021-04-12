@@ -1,0 +1,48 @@
+@uri=http://localhost:2918
+
+
+### Select All
+GET {{uri}}/books HTTP/1.1
+
+
+### Search
+POST {{uri}}/books HTTP/1.1
+content-type: application/json
+
+{
+    "keywords": 	{
+		"name":   "흔한남매 7",
+		"price":  10800,
+		"author": "백난도",
+		"isbn":   "9791164137527"
+	},
+    "options": {
+        "operation": "or",
+        "count": 10
+    }
+}
+
+### Add book
+PUT {{uri}}/books HTTP/1.1
+
+{
+    "name": "2020 추천도서목록",
+    "price": "27000",
+    "author": "(주)학교도서관저널",
+    "isbn": "1122334455667"
+}
+
+
+### Edit book
+PATCH {{uri}}/books/1 HTTP/1.1
+
+{
+    "name": "2020 추천도서목록",
+    "price": "27000",
+    "author": "(주)학교도서관저널",
+    "isbn": "1122334455667"
+}
+
+
+### DELETE book
+DELETE {{uri}}/books/1 HTTP/1.1
