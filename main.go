@@ -15,15 +15,11 @@ import (
 )
 
 type Book struct {
-	IDX       int64   `json:"idx"`
-	Name      string  `json:"name"`
-	Price     float64 `json:"price"`
-	SalePrice float64 `json:"sale-price"`
-	PriceUnit string  `json:"price-unit"`
-	Author    string  `json:"author"`
-	Edition   int64   `json:"edition"`
-	Publisher string  `json:"publisher"`
-	ISBN      string  `json:"isbn"`
+	IDX    int64   `json:"idx"`
+	Name   string  `json:"name"`
+	Price  float64 `json:"price"`
+	Author string  `json:"author"`
+	ISBN   string  `json:"isbn"`
 }
 
 var (
@@ -36,24 +32,16 @@ var (
 
 var booksDummy = []Book{
 	{
-		Name:      "흔한남매 7",
-		Price:     10800,
-		SalePrice: 9300,
-		PriceUnit: "KRW",
-		Author:    "백난도",
-		Edition:   1,
-		Publisher: "미래엔아이세움",
-		ISBN:      "9791164137527",
+		Name:   "흔한남매 7",
+		Price:  10800,
+		Author: "백난도",
+		ISBN:   "9791164137527",
 	},
 	{
-		Name:      "성장의 종말",
-		Price:     17000,
-		SalePrice: 15300,
-		PriceUnit: "KRW",
-		Author:    "디트리히 볼래스",
-		Edition:   1,
-		Publisher: "더퀘스트",
-		ISBN:      "9791165215170",
+		Name:   "성장의 종말",
+		Price:  17000,
+		Author: "디트리히 볼래스",
+		ISBN:   "9791165215170",
 	},
 }
 
@@ -80,11 +68,7 @@ func CreateTable(recreate bool) error {
 		"IDX"			INTEGER,
 		"NAME"			TEXT,
 		"PRICE"			REAL,
-		"SALE_PRICE"	REAL,
-		"PRICE_UNIT"	TEXT,
 		"AUTHOR"		TEXT,
-		"EDITION"		INTEGER,
-		"PUBLISHER"		TEXT,
 		"ISBN"			TEXT UNIQUE,
 		PRIMARY KEY("IDX" AUTOINCREMENT)
 	);`
@@ -105,18 +89,14 @@ func InsertData(book Book) error {
 
 	sql += `
 	INSERT OR REPLACE INTO "#TABLE_NAME"
-		(NAME, PRICE, SALE_PRICE, PRICE_UNIT, AUTHOR, PUBLISHER, EDITION, ISBN)
-	VAlUES("#BOOK_NAME", #PRICE_NORMAL, #SALE_PRICE, "#PRICE_UNIT", "#AUTHOR", "#PUBLISHER", #EDITION, #ISBN);`
+		(NAME, PRICE, AUTHOR, ISBN)
+	VAlUES("#BOOK_NAME", #PRICE_NORMAL, "#AUTHOR", #ISBN);`
 
 	sql = strings.ReplaceAll(sql, "#TABLE_NAME", tableName)
 
 	sql = strings.ReplaceAll(sql, "#BOOK_NAME", book.Name)
 	sql = strings.ReplaceAll(sql, "#PRICE_NORMAL", fmt.Sprint(book.Price))
-	sql = strings.ReplaceAll(sql, "#SALE_PRICE", fmt.Sprint(book.SalePrice))
-	sql = strings.ReplaceAll(sql, "#PRICE_UNIT", book.PriceUnit)
 	sql = strings.ReplaceAll(sql, "#AUTHOR", book.Author)
-	sql = strings.ReplaceAll(sql, "#PUBLISHER", book.Publisher)
-	sql = strings.ReplaceAll(sql, "#EDITION", fmt.Sprint(book.Edition))
 	sql = strings.ReplaceAll(sql, "#ISBN", book.ISBN)
 
 	_, err := db.Exec(sql)
@@ -133,7 +113,7 @@ func SelectData(db *sql.DB, search Book) ([]Book, error) {
 
 	sql += `
 	SELECT
-		IDX, NAME, PRICE, SALE_PRICE, PRICE_UNIT, AUTHOR, EDITION, PUBLISHER, ISBN
+		IDX, NAME, PRICE, AUTHOR, ISBN
 	FROM #TABLE_NAME
 	`
 
@@ -149,7 +129,7 @@ func SelectData(db *sql.DB, search Book) ([]Book, error) {
 	for rows.Next() {
 		var b Book
 
-		err = rows.Scan(&b.IDX, &b.Name, &b.Price, &b.SalePrice, &b.PriceUnit, &b.Author, &b.Edition, &b.Publisher, &b.ISBN)
+		err = rows.Scan(&b.IDX, &b.Name, &b.Price, &b.Author, &b.ISBN)
 		if err != nil {
 			return nil, err
 		}

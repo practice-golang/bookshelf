@@ -17,24 +17,16 @@
                     <th>책이름</th>
                     <th>저자</th>
                     <th>가격</th>
-                    <th>할인가</th>
-                    <th>화폐단위</th>
-                    <th>판본</th>
-                    <th>출판사</th>
                     <th>ISBN</th>
                 </tr>
             </thead>
             <tbody>
                 <template v-for="(b, i) in books">
                     <tr>
-                        <td>{{i+1}}/{{b.idx}}</td>
+                        <td>{{b.idx}}</td>
                         <td>{{b.name}}</td>
                         <td>{{b.author}}</td>
                         <td>{{b.price}}</td>
-                        <td>{{b["sale-price"]}}</td>
-                        <td>{{b["price-unit"]}}</td>
-                        <td>{{b.edition}}</td>
-                        <td>{{b.publisher}}</td>
                         <td>{{b.isbn}}</td>
                     </tr>
                 </template>
@@ -50,9 +42,10 @@
             restURI: "/books",
             books: [{
                 idx: 99,
-                name: "테스트이름",
+                name: "책제목",
                 author: "작가님",
                 price: 12345,
+                isbn: 1111111111113,
             }]
         },
         mounted() {
