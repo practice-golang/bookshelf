@@ -3,10 +3,14 @@ package main // import "bookshelf"
 import (
 	"database/sql"
 	"embed"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"reflect"
 	"strings"
+	"time"
 
 	"github.com/doug-martin/goqu/v9"
 	_ "modernc.org/sqlite"
@@ -15,10 +19,12 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 
 	"gopkg.in/guregu/null.v4"
+
+	"github.com/thoas/go-funk"
 )
 
 type Book struct {
-	Idx    null.String `json:"idx" db:"IDX"`
+	Idx    null.String `json:"idx" db:"IDX" goqu:"skipinsert,skipupdate"`
 	Name   null.String `json:"name" db:"NAME"`
 	Price  null.Float  `json:"price" db:"PRICE"`
 	Author null.String `json:"author" db:"AUTHOR"`
@@ -30,23 +36,9 @@ var (
 	tableName  = "BOOKSHELF"
 	db         *sql.DB
 	//go:embed static
-	content embed.FS
+	content      embed.FS
+	updateTarget = []string{"idx"} // UPDATE ... WHERE idx=?
 )
-
-var booksDummy = []Book{
-	{
-		Name:   null.NewString("흔한남매 7", true),
-		Price:  null.NewFloat(10800, true),
-		Author: null.NewString("백난도", true),
-		ISBN:   null.NewString("9791164137527", true),
-	},
-	{
-		Name:   null.NewString("성장의 종말", true),
-		Price:  null.NewFloat(17000, true),
-		Author: null.NewString("디트리히 볼래스", true),
-		ISBN:   null.NewString("9791165215170", true),
-	},
-}
 
 // InitDB - DB파일 생성
 func InitDB() (*sql.DB, error) {
@@ -86,52 +78,62 @@ func CreateTable(recreate bool) error {
 	return nil
 }
 
-// InsertData - Crud
-func InsertData(book Book) error {
-	sql := ""
+// CheckValidAndPrepareWhere - 빠진 요소 체크, Where 요소 준비
+func CheckValidAndPrepareWhere(book Book) (goqu.Ex, error) {
+	result := goqu.Ex{}
 
-	sql += `
-	INSERT INTO "#TABLE_NAME"
-		(NAME, PRICE, AUTHOR, ISBN)
-	VAlUES("#BOOK_NAME", #PRICE_NORMAL, "#AUTHOR", #ISBN);`
+	values := reflect.ValueOf(book)
+	bookReflect := values.Type()
 
-	sql = strings.ReplaceAll(sql, "#TABLE_NAME", tableName)
-
-	sql = strings.ReplaceAll(sql, "#BOOK_NAME", book.Name.String)
-	sql = strings.ReplaceAll(sql, "#PRICE_NORMAL", fmt.Sprint(book.Price.Float64))
-	sql = strings.ReplaceAll(sql, "#AUTHOR", book.Author.String)
-	sql = strings.ReplaceAll(sql, "#ISBN", book.ISBN.String)
-
-	_, err := db.Exec(sql)
-	if err != nil {
-		return err
+	for i := 0; i < values.NumField(); i++ {
+		f := values.Field(i).Interface()
+		b := bookReflect.Field(i)
+		// log.Println(b.Name)
+		jsonName := b.Tag.Get("json")
+		switch f := f.(type) {
+		case null.String:
+			if !f.Valid {
+				return nil, errors.New("`" + jsonName + "` must have a value")
+			}
+			if funk.Contains(updateTarget, jsonName) {
+				result[jsonName], _ = f.Value()
+			}
+		case null.Int:
+			if !f.Valid {
+				return nil, errors.New("`" + jsonName + "` must have a value")
+			}
+			if funk.Contains(updateTarget, jsonName) {
+				result[jsonName], _ = f.Value()
+			}
+		case null.Float:
+			if !f.Valid {
+				return nil, errors.New("`" + jsonName + "` must have a value")
+			}
+			if funk.Contains(updateTarget, jsonName) {
+				result[jsonName], _ = f.Value()
+			}
+		}
 	}
 
-	return nil
+	return result, nil
 }
 
-// InsertReplaceData - Crud
-func InsertReplaceData(book Book) error {
-	sql := ""
+// InsertData - Crud
+func InsertData(books []Book) (sql.Result, error) {
+	dbms := goqu.New("sqlite3", db)
+	ds := dbms.Insert(tableName).Rows(books)
+	sql, args, _ := ds.ToSQL()
+	log.Println(sql, args)
 
-	sql += `
-	INSERT OR REPLACE INTO "#TABLE_NAME"
-		(NAME, PRICE, AUTHOR, ISBN)
-	VAlUES("#BOOK_NAME", #PRICE_NORMAL, "#AUTHOR", #ISBN);`
-
-	sql = strings.ReplaceAll(sql, "#TABLE_NAME", tableName)
-
-	sql = strings.ReplaceAll(sql, "#BOOK_NAME", book.Name.String)
-	sql = strings.ReplaceAll(sql, "#PRICE_NORMAL", fmt.Sprint(book.Price.Float64))
-	sql = strings.ReplaceAll(sql, "#AUTHOR", book.Author.String)
-	sql = strings.ReplaceAll(sql, "#ISBN", book.ISBN.String)
-
-	_, err := db.Exec(sql)
+	result, err := db.Exec(sql)
 	if err != nil {
-		return err
+		// lastID, _ := result.LastInsertId()
+		// affRows, _ := result.RowsAffected()
+		// log.Println(lastID, affRows)
+		return nil, err
 	}
 
-	return nil
+	return result, nil
 }
 
 // SelectData - cRud
@@ -149,6 +151,66 @@ func SelectData(search Book) ([]Book, error) {
 	return result, nil
 }
 
+// UpdateData - crUd
+func UpdateData(book Book) (sql.Result, error) {
+	whereEXP, err := CheckValidAndPrepareWhere(book)
+	if err != nil {
+		return nil, err
+	}
+
+	dbms := goqu.New("sqlite3", db)
+	ds := dbms.Update(tableName).Set(book).Where(whereEXP)
+	sql, args, _ := ds.ToSQL()
+	log.Println(sql, args)
+
+	result, err := db.Exec(sql)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func DeleteData(target, value string) (sql.Result, error) {
+	whereEXP := goqu.Ex{target: value}
+
+	dbms := goqu.New("sqlite3", db)
+	ds := dbms.Delete(tableName).Where(whereEXP)
+	sql, args, _ := ds.ToSQL()
+	log.Println(sql, args)
+
+	result, err := db.Exec(sql)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// AddBooks - 책정보 입력
+func AddBooks(c echo.Context) error {
+	var books []Book
+
+	if err := c.Bind(&books); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"msg": err.Error()})
+	}
+
+	sqlResult, err := InsertData(books)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"msg": err.Error()})
+	}
+
+	lastID, _ := sqlResult.LastInsertId()
+	affRows, _ := sqlResult.RowsAffected()
+
+	result := map[string]string{
+		"last-id":       fmt.Sprint(lastID),
+		"affected-rows": fmt.Sprint(affRows),
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
 // GetBooks - 책정보 취득
 func GetBooks(c echo.Context) error {
 	data, err := SelectData(Book{})
@@ -163,18 +225,48 @@ func GetBooks(c echo.Context) error {
 	return c.JSON(http.StatusOK, data)
 }
 
-// SetDummy - 더미데이터 입력
-func SetDummy(c echo.Context) error {
-	var err error
-	for _, book := range booksDummy {
-		err = InsertData(book)
-		if err != nil {
-			log.Println("InsertData: ", err)
-			return c.JSON(http.StatusConflict, map[string]string{"msg": err.Error()})
-		}
+// EditBooks - 책정보 수정
+func EditBooks(c echo.Context) error {
+	var book Book
+
+	if err := c.Bind(&book); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"msg": err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, "OK")
+	sqlResult, err := UpdateData(book)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"msg": err.Error()})
+	}
+
+	lastID, _ := sqlResult.LastInsertId()
+	affRows, _ := sqlResult.RowsAffected()
+
+	result := map[string]string{
+		"last-id":       fmt.Sprint(lastID),
+		"affected-rows": fmt.Sprint(affRows),
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
+// DeleteBook - 책 1개 삭제
+func DeleteBook(c echo.Context) error {
+	idx := c.Param("idx")
+
+	sqlResult, err := DeleteData("idx", idx)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	lastID, _ := sqlResult.LastInsertId()
+	affRows, _ := sqlResult.RowsAffected()
+
+	result := map[string]string{
+		"last-id":       fmt.Sprint(lastID),
+		"affected-rows": fmt.Sprint(affRows),
+	}
+
+	return c.JSON(http.StatusOK, result)
 }
 
 func setupDB() error {
@@ -194,6 +286,30 @@ func setupDB() error {
 	return err
 }
 
+func dumpHandler(c echo.Context, reqBody, resBody []byte) {
+	header := time.Now().Format("2006-01-02 15:04:05") + " - "
+	body := string(reqBody)
+	body = strings.Replace(body, "\r\n", "", -1)
+	body = strings.Replace(body, "\n", "", -1)
+	data := header + body + "\n"
+
+	f, err := os.OpenFile(
+		"request-body.log",
+		os.O_APPEND|os.O_CREATE|os.O_RDWR,
+		os.FileMode(0777),
+	)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	defer f.Close()
+
+	if _, err = f.WriteString(data); err != nil {
+		log.Println(err)
+		return
+	}
+}
+
 func setupServer() *echo.Echo {
 	e := echo.New()
 	e.HideBanner = true
@@ -208,17 +324,51 @@ func setupServer() *echo.Echo {
 
 	e.GET("/*", contentHandler, contentRewrite)
 	e.GET("/books", GetBooks)
-	e.PUT("/books/dummy", SetDummy)
+	e.PUT("/books", AddBooks)
+	e.PATCH("/books", EditBooks)
+	e.DELETE("/book/:idx", DeleteBook)
 
 	return e
 }
 
 func main() {
-	err := setupDB()
+	var fileConnectionLog *os.File
+	var err error
+
+	err = setupDB()
 	if err != nil {
 		log.Fatal("Setup DB: ", err)
 	}
 
 	e := setupServer()
+
+	fileConnectionLog, err = os.OpenFile(
+		"connection.log",
+		os.O_APPEND|os.O_CREATE|os.O_RDWR,
+		os.FileMode(0777),
+	)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer fileConnectionLog.Close()
+
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Format: `${time_rfc3339} - remote_ip:${remote_ip}, host:${host}, ` +
+			`method:${method}, uri:${uri},status:${status}, error:${error}, ` +
+			`${header:Authorization}, query:${query:property}, form:${form}, ` + "\n",
+		Output: fileConnectionLog,
+	}))
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins:     []string{"*"},
+		AllowHeaders:     []string{"Authorization", "Content-Type"},
+		AllowCredentials: true,
+		AllowMethods: []string{
+			echo.GET, echo.POST, echo.PUT, echo.PATCH, echo.DELETE,
+			echo.HEAD, echo.OPTIONS,
+		},
+	}))
+
+	e.Use(middleware.BodyDump(dumpHandler))
+
 	e.Logger.Fatal(e.Start("127.0.0.1:2918"))
 }
