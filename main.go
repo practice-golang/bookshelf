@@ -77,9 +77,11 @@ func setupServer() *echo.Echo {
 	contentRewrite := middleware.Rewrite(map[string]string{"/*": "/static/$1"})
 
 	e.GET("/*", contentHandler, contentRewrite)
+	e.GET("/book/:idx", book.GetBook)
 	e.GET("/books", book.GetBooks)
+	e.POST("/books", book.SearchBooks)
 	e.PUT("/books", book.AddBooks)
-	e.PATCH("/books", book.EditBooks)
+	e.PATCH("/book", book.EditBook)
 	e.DELETE("/book/:idx", book.DeleteBook)
 
 	return e
@@ -89,7 +91,8 @@ func main() {
 	var fileConnectionLog *os.File
 	var err error
 
-	db.UpdateTarget = []string{"idx"} // UPDATE ... WHERE idx=?
+	db.UpdateScope = []string{"idx"}             // UPDATE ... WHERE idx=?
+	db.IgnoreScope = []string{"author", "price"} // Ignore if nil or null
 
 	err = setupDB()
 	if err != nil {

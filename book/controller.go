@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"gopkg.in/guregu/null.v4"
 )
 
 // AddBooks - 책정보 입력
@@ -34,22 +35,72 @@ func AddBooks(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
-// GetBooks - 책정보 취득
-func GetBooks(c echo.Context) error {
-	data, err := db.SelectData(models.Book{})
+// GetBook - 책정보 한개 취득
+func GetBook(c echo.Context) error {
+	idx := c.Param("idx")
+	// var data interface{}
+	var data []models.Book
+	var err error
+	dataINTF, err := db.SelectData(models.Book{Idx: null.NewString(idx, true)})
 	if err != nil {
 		log.Fatal("SelectData: ", err)
 	}
-
-	// for _, b := range data {
-	// 	log.Println(b.IDX, b.Name, b.Author, b.Price)
+	if dataINTF != nil {
+		data = dataINTF.([]models.Book)
+	} else {
+		log.Println("Control WTF null")
+	}
+	// data, err = db.SelectData(models.Book{})
+	// if err != nil {
+	// 	log.Fatal("SelectData: ", err)
 	// }
 
 	return c.JSON(http.StatusOK, data)
 }
 
-// EditBooks - 책정보 수정
-func EditBooks(c echo.Context) error {
+// GetBooks - 책정보 취득 검색
+func GetBooks(c echo.Context) error {
+	// var data interface{}
+	var data []models.Book
+	var err error
+	dataINTF, err := db.SelectData(models.Book{})
+	if err != nil {
+		log.Fatal("SelectData: ", err)
+	}
+	if dataINTF != nil {
+		data = dataINTF.([]models.Book)
+	} else {
+		log.Println("Control WTF null")
+	}
+
+	return c.JSON(http.StatusOK, data)
+}
+
+// SearchBooks - 책정보 검색 또는 페이징
+func SearchBooks(c echo.Context) error {
+	var data []models.Book
+	var search models.BookSearch
+	var err error
+
+	if err := c.Bind(&search); err != nil {
+		log.Fatal("Search data: ", err)
+	}
+
+	dataINTF, err := db.SelectData(search)
+	if err != nil {
+		log.Fatal("SelectData: ", err)
+	}
+	if dataINTF != nil {
+		data = dataINTF.([]models.Book)
+	} else {
+		log.Println("Control WTF null")
+	}
+
+	return c.JSON(http.StatusOK, data)
+}
+
+// EditBook - 책정보 수정
+func EditBook(c echo.Context) error {
 	var book models.Book
 
 	if err := c.Bind(&book); err != nil {

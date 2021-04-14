@@ -1,24 +1,54 @@
 @uri=http://localhost:2918
 
 
-### Select All
+
+### Select one
+GET {{uri}}/book/1 HTTP/1.1
+
+
+### Select All - Limit 10
 GET {{uri}}/books HTTP/1.1
 
 
-### Search
+### No paging, no search. listCount of /db/db.go: 3
+POST {{uri}}/books HTTP/1.1
+content-type: application/json
+
+
+### Paging
 POST {{uri}}/books HTTP/1.1
 content-type: application/json
 
 {
-    "keywords": 	{
-		"name":   "흔한남매 7",
-		"price":  10800,
-		"author": "백난도",
-		"isbn":   "9791164137527"
-	},
     "options": {
-        "operation": "or",
-        "count": 10
+        "page": 0,
+        "count": 3
+    }
+}
+
+
+### Search
+### keywords -> book{name and author and price ...} or book{name and author and price} ...
+### book 내부는 and, book끼리는 or
+POST {{uri}}/books HTTP/1.1
+content-type: application/json
+
+{
+    "keywords": [
+        {
+            "author": "칼 세이건"
+        },
+        {
+            "author": "김용"
+        },
+        {
+            "name": "흔한남매 7",
+            "author": "백난도"
+        }
+    ],
+    "options": {
+        "page": 0,
+        "count": 3
     }
 }
 
@@ -38,6 +68,30 @@ content-type: application/json
         "price": "10800",
         "author": "백난도",
         "isbn": "9791164137527"
+    },
+    {
+        "name": "코스모스",
+        "price": "16650",
+        "author": "칼 세이건",
+        "isbn": "9788983711892"
+    },
+    {
+        "name": "사조영웅전",
+        "price": "65000",
+        "author": "김용",
+        "isbn": "9788934987475"
+    },
+    {
+        "name": "신조협려",
+        "price": "102400",
+        "author": "김용",
+        "isbn": "9788934985808"
+    },
+    {
+        "name": "PSPICE for Circuit Theory and Electronic Devices",
+        "price": "57000",
+        "author": "Tobin, Paul",
+        "isbn": "9781598291568"
     }
 ]
 
@@ -55,17 +109,15 @@ content-type: application/json
 ]
 
 ### Edit book
-PATCH {{uri}}/books HTTP/1.1
+PATCH {{uri}}/book HTTP/1.1
 content-type: application/json
-[
-    {
-        "idx": "2",
-        "name": "배트맨 다크 나이트 리턴즈 1",
-        "price": "15000",
-        "author": "프랭크 밀러",
-        "isbn": "9788983713971"
-    }
-]
+
+{
+    "idx": "2",
+    "name": "배트맨 다크 나이트 리턴즈 1",
+    "price": "15000",
+    "isbn": "9788983713971"
+}
 
 ### DELETE book
 DELETE {{uri}}/book/1 HTTP/1.1
