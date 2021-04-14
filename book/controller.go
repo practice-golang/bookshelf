@@ -4,6 +4,7 @@ import (
 	"db"
 	"fmt"
 	"log"
+	"math"
 	"models"
 	"net/http"
 
@@ -139,6 +140,30 @@ func DeleteBook(c echo.Context) error {
 		"last-id":       fmt.Sprint(lastID),
 		"affected-rows": fmt.Sprint(affRows),
 	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
+func GetTotalPage(c echo.Context) error {
+	var req map[string]uint
+
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"msg": err.Error()})
+	}
+
+	data, err := db.SelectCount()
+	if err != nil {
+		log.Fatal("SelectCount: ", err)
+	}
+
+	countPerPage := uint(1)
+	if req["count"] > 0 {
+		countPerPage = req["count"]
+	}
+
+	pages := uint(math.Ceil(float64(data) / float64(countPerPage)))
+
+	result := map[string]uint{"total-page": pages}
 
 	return c.JSON(http.StatusOK, result)
 }

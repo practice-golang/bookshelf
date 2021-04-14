@@ -84,6 +84,8 @@ func setupServer() *echo.Echo {
 	e.PATCH("/book", book.EditBook)
 	e.DELETE("/book/:idx", book.DeleteBook)
 
+	e.POST("/total-page", book.GetTotalPage)
+
 	return e
 }
 

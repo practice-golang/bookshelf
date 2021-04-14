@@ -103,6 +103,7 @@ func UpdateData(data interface{}) (sql.Result, error) {
 	return result, nil
 }
 
+// DeleteData - cruD
 func DeleteData(target, value string) (sql.Result, error) {
 	whereEXP := goqu.Ex{target: value}
 
@@ -117,4 +118,15 @@ func DeleteData(target, value string) (sql.Result, error) {
 	}
 
 	return result, nil
+}
+
+// SelectCount - data count -> pages = (data count) / (count per page)
+func SelectCount() (uint, error) {
+	var cnt uint
+
+	dbms := goqu.New("sqlite3", Dsn)
+	ds := dbms.From(TableName).Select(goqu.COUNT("*").As("PAGE_COUNT"))
+	ds.ScanVal(&cnt)
+
+	return cnt, nil
 }

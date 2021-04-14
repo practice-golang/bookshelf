@@ -10,9 +10,18 @@ GET {{uri}}/book/1 HTTP/1.1
 GET {{uri}}/books HTTP/1.1
 
 
-### No paging, no search. listCount of /db/db.go: 3
+### Select Data No paging, no search. listCount of /db/db.go: 3
 POST {{uri}}/books HTTP/1.1
 content-type: application/json
+
+
+### Total page
+POST {{uri}}/total-page HTTP/1.1
+content-type: application/json
+
+{
+    "count": 3
+}
 
 
 ### Paging

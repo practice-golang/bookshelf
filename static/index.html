@@ -3,12 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-    <script src="/js/vue.min.js"></script>
+    <script src="js/vue.min.js"></script>
 </head>
 
 <body>
     <div id="app">
         <h1>Bookshelf</h1>
+
+        <label>찾기</label>:<input name="" value="" />
 
         <table>
             <thead>
@@ -32,6 +34,18 @@
                 </template>
             </tbody>
         </table>
+
+        <hr />
+        <template v-for="i in page.total">
+            <template v-if="i == page.current">
+                &nbsp;<span><b>{{i}}</b></span>&nbsp;
+            </template>
+            <template v-else>
+                &nbsp;<a href="javascript:" @click="movePage(i)">{{i}}</a>&nbsp;
+            </template>
+        </template>
+
+
     </div>
 </body>
 
@@ -39,7 +53,12 @@
     const vm = new Vue({
         el: "#app",
         data: {
-            restURI: "/books",
+            restURI: "http://localhost:2918",
+            page: {
+                current: 1,
+                total: 1,
+                countPerPage: 3,
+            },
             books: [{
                 idx: 99,
                 name: "책제목",
@@ -52,9 +71,50 @@
             this.initData()
         },
         methods: {
-            async initData() {
-                let response = await fetch(this.restURI, { method: "GET" })
-                if (response.ok) { this.books = await response.json() }
+            initData() {
+                this.getTotalPage()
+                this.getData()
+            },
+            async getTotalPage() {
+                let response = await fetch(this.restURI + "/total-page", {
+                    method: "POST",
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ "count": 3 })
+                })
+                if (response.ok) {
+                    r = await response.json()
+                    this.page.total = r["total-page"]
+                }
+            },
+            async getData() {
+                // let response = await fetch(this.restURI + "/books", { method: "GET" })
+                // if (response.ok) { this.books = await response.json() }
+                let response = await fetch(this.restURI + "/books", {
+                    method: "POST",
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        "options": {
+                            "page": this.page.current - 1,
+                            "count": this.page.countPerPage
+                        }
+                    })
+                })
+                if (response.ok) {
+                    this.books = await response.json()
+                }
+            },
+            movePage(page) {
+                // page 1 = idx 0
+                this.page.current = page
+                this.getData()
+
+                return false
             }
         }
     })
