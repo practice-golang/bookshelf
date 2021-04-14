@@ -15,7 +15,7 @@
         <table>
             <thead>
                 <tr>
-                    <th>순번</th>
+                    <th @click="changeOrder()"><a href="javascript:" >순번</a></th>
                     <th>책이름</th>
                     <th>저자</th>
                     <th>가격</th>
@@ -58,6 +58,7 @@
                 current: 1,
                 total: 1,
                 countPerPage: 3,
+                order: "desc",
             },
             books: [{
                 idx: 99,
@@ -101,7 +102,8 @@
                     body: JSON.stringify({
                         "options": {
                             "page": this.page.current - 1,
-                            "count": this.page.countPerPage
+                            "count": this.page.countPerPage,
+                            "order": this.page.order,
                         }
                     })
                 })
@@ -115,6 +117,14 @@
                 this.getData()
 
                 return false
+            },
+            changeOrder() {
+                if (this.page.order == "asc") {
+                    this.page.order = "desc"
+                } else if (this.page.order == "desc") {
+                    this.page.order = "asc"
+                }
+                this.getData()
             }
         }
     })

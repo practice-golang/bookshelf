@@ -15,8 +15,9 @@ type Book struct {
 
 // Options - Paging options
 type Options struct {
-	Count null.Int `json:"count"`
-	Page  null.Int `json:"page"`
+	Count null.Int    `json:"count"`
+	Page  null.Int    `json:"page"`
+	Order null.String `json:"order"`
 }
 
 // BookSearch - Search

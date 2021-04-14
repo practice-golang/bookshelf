@@ -55,6 +55,12 @@ func SelectData(search interface{}) (interface{}, error) {
 		}
 		ds = ds.Where(goqu.Or(whereEXPRs...))
 
+		orderDirection := goqu.C(OrderScope).Asc()
+		if search.Options.Order.String == "desc" {
+			orderDirection = goqu.C(OrderScope).Desc()
+		}
+		ds = ds.Order(orderDirection)
+
 		cnt := listCount
 		if search.Options.Count.Valid {
 			cnt = uint(search.Options.Count.Int64)

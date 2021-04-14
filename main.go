@@ -95,6 +95,7 @@ func main() {
 
 	db.UpdateScope = []string{"idx"}             // UPDATE ... WHERE idx=?
 	db.IgnoreScope = []string{"author", "price"} // Ignore if nil or null
+	db.OrderScope = "IDX"
 
 	err = setupDB()
 	if err != nil {
