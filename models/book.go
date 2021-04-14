@@ -13,13 +13,6 @@ type Book struct {
 	ISBN   null.String `json:"isbn" db:"ISBN"`
 }
 
-// Options - Paging options
-type Options struct {
-	Count null.Int    `json:"count"`
-	Page  null.Int    `json:"page"`
-	Order null.String `json:"order"`
-}
-
 // BookSearch - Search
 type BookSearch struct {
 	Keywords []Book  `json:"keywords" db:"-"` // 검색 키워드
