@@ -11,12 +11,12 @@
     <div id="app">
         <h1>Bookshelf</h1>
 
-        <label>찾기</label>:<input name="" value="" /><button>검색</button>
+        <label>찾기</label>:<input v-model="searchKeyword" /><button @click="search()">검색</button>
 
         <table>
             <thead>
                 <tr>
-                    <th @click="changeOrder()"><a href="javascript:" >순번</a></th>
+                    <th @click="changeOrder()"><a href="javascript:">순번</a></th>
                     <th>책이름</th>
                     <th>저자</th>
                     <th>가격</th>
@@ -67,7 +67,8 @@
                 author: "작가님",
                 price: 12345,
                 isbn: 1111111111113,
-            }]
+            }],
+            searchKeyword: "",
         },
         mounted() {
             this.initData()
@@ -92,6 +93,14 @@
                 }
             },
             async getData() {
+                let keywords = []
+                if (this.searchKeyword != "") {
+                    keywords.push(
+                        { "name": this.searchKeyword },
+                        { "author": this.searchKeyword },
+                    )
+                }
+
                 // let response = await fetch(this.restURI + "/books", { method: "GET" })
                 // if (response.ok) { this.books = await response.json() }
                 let response = await fetch(this.restURI + "/books", {
@@ -101,6 +110,7 @@
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
+                        "keywords": keywords,
                         "options": {
                             "page": this.page.current - 1,
                             "count": this.page.countPerPage,
@@ -125,6 +135,9 @@
                 } else if (this.page.order == "desc") {
                     this.page.order = "asc"
                 }
+                this.getData()
+            },
+            search() {
                 this.getData()
             }
         }

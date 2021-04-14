@@ -23,16 +23,16 @@ content-type: application/json
     "count": 2
 }
 
-
 ### Paging - 아래 Search에서 keyword만 제외
 POST {{uri}}/books HTTP/1.1
 content-type: application/json
 
 {
+    "keywords": [],
     "options": {
         "page": 0,
-        "count": 9,
-        "order": "desc"
+        "count": 2,
+        "order": "asc"
     }
 }
 
