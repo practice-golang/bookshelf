@@ -112,8 +112,12 @@ func TestDeleteData(t *testing.T) {
 }
 
 func TestSelectCount(t *testing.T) {
+	type args struct {
+		search interface{}
+	}
 	tests := []struct {
 		name    string
+		args    args
 		want    uint
 		wantErr bool
 	}{
@@ -121,7 +125,7 @@ func TestSelectCount(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := SelectCount()
+			got, err := SelectCount(tt.args.search)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("SelectCount() error = %v, wantErr %v", err, tt.wantErr)
 				return
