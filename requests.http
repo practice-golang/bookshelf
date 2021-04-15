@@ -20,8 +20,12 @@ POST {{uri}}/total-page HTTP/1.1
 content-type: application/json
 
 {
-    "count": 2
+    "keywords": [],
+    "options": {
+        "count": 2
+    }
 }
+
 
 ### Paging - 아래 Search에서 keyword만 제외
 POST {{uri}}/books HTTP/1.1
@@ -130,4 +134,4 @@ content-type: application/json
 }
 
 ### DELETE book
-DELETE {{uri}}/book/5 HTTP/1.1
+DELETE {{uri}}/book/6 HTTP/1.1

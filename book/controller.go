@@ -144,21 +144,22 @@ func DeleteBook(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
+// GetTotalPage - 전체 페이지 취득
 func GetTotalPage(c echo.Context) error {
-	var req map[string]uint
+	var search models.BookSearch
 
-	if err := c.Bind(&req); err != nil {
+	if err := c.Bind(&search); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"msg": err.Error()})
 	}
 
-	data, err := db.SelectCount()
+	data, err := db.SelectCount(search)
 	if err != nil {
 		log.Fatal("SelectCount: ", err)
 	}
 
 	countPerPage := uint(1)
-	if req["count"] > 0 {
-		countPerPage = req["count"]
+	if search.Options.Count.Valid {
+		countPerPage = uint(search.Options.Count.Int64)
 	}
 
 	pages := uint(math.Ceil(float64(data) / float64(countPerPage)))

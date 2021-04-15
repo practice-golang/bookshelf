@@ -12,7 +12,4 @@ golang embed, doug-martin/goqu, cznic/sqlite CRUD
 http://localhost:2918
 
 ## Todo
-- [ ] 검색시 페이징
-- [ ] Like 검색
-- [ ] 삭제버튼
 - [ ] 입력, 수정창

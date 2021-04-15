@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"models"
 
@@ -35,9 +36,9 @@ func SelectData(search interface{}) (interface{}, error) {
 
 	switch search := search.(type) {
 	case models.Book:
-		whereEXP := PrepareWhere(search)
-		if !whereEXP.IsEmpty() {
-			ds = ds.Where(whereEXP)
+		exps := PrepareWhere(search)
+		if !exps.IsEmpty() {
+			ds = ds.Where(exps)
 		}
 		// cnt := listCount
 		cnt := uint(10)
@@ -45,15 +46,18 @@ func SelectData(search interface{}) (interface{}, error) {
 
 	case models.BookSearch:
 		keywords := search.Keywords
-		whereEXPRs := []goqu.Expression{}
+		exps := []goqu.Expression{}
 		for _, k := range keywords {
-			exp := PrepareWhere(k)
-			if !exp.IsEmpty() {
-				exp.Expression()
-				whereEXPRs = append(whereEXPRs, exp.Expression())
+			ex := PrepareWhere(k)
+			if !ex.IsEmpty() {
+				for c, v := range ex {
+					val := fmt.Sprintf("%s%s%s", "%", v, "%")
+					ex[c] = goqu.Op{"like": val}
+				}
+				exps = append(exps, ex.Expression())
 			}
 		}
-		ds = ds.Where(goqu.Or(whereEXPRs...))
+		ds = ds.Where(goqu.Or(exps...))
 
 		orderDirection := goqu.C(OrderScope).Asc()
 		if search.Options.Order.String == "desc" {
@@ -127,11 +131,32 @@ func DeleteData(target, value string) (sql.Result, error) {
 }
 
 // SelectCount - data count -> pages = (data count) / (count per page)
-func SelectCount() (uint, error) {
+func SelectCount(search interface{}) (uint, error) {
 	var cnt uint
 
 	dbms := goqu.New("sqlite3", Dsn)
 	ds := dbms.From(TableName).Select(goqu.COUNT("*").As("PAGE_COUNT"))
+
+	switch search := search.(type) {
+	case models.BookSearch:
+		keywords := search.Keywords
+		exps := []goqu.Expression{}
+		for _, k := range keywords {
+			ex := PrepareWhere(k)
+			if !ex.IsEmpty() {
+				for c, v := range ex {
+					val := fmt.Sprintf("%s%s%s", "%", v, "%")
+					ex[c] = goqu.Op{"like": val}
+				}
+				exps = append(exps, ex.Expression())
+			}
+		}
+		ds = ds.Where(goqu.Or(exps...))
+	}
+
+	sql, args, _ := ds.ToSQL()
+	log.Println(sql, args)
+
 	ds.ScanVal(&cnt)
 
 	return cnt, nil

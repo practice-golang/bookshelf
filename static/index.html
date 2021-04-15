@@ -12,7 +12,7 @@
     <div id="app">
         <h1>Bookshelf</h1>
 
-        <label>찾기</label>:<input v-model="searchKeyword" /><button @click="search()">검색</button>
+        <label>찾기</label>:<input v-model="searchKeyword" @keyup.enter="search()" /><button @click="search()">검색</button>
 
         <table>
             <thead>
@@ -22,6 +22,7 @@
                     <th>저자</th>
                     <th>가격</th>
                     <th>ISBN</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -32,6 +33,7 @@
                         <td>{{b.author}}</td>
                         <td>{{b.price}}</td>
                         <td>{{b.isbn}}</td>
+                        <td><button @click="deleteData(b.idx)">삭제</button></td>
                     </tr>
                 </template>
             </tbody>
@@ -76,17 +78,29 @@
         },
         methods: {
             initData() {
-                this.getTotalPage()
                 this.getData()
             },
             async getTotalPage() {
+                let keywords = []
+                if (this.searchKeyword != "") {
+                    keywords.push(
+                        { "name": this.searchKeyword },
+                        { "author": this.searchKeyword },
+                    )
+                }
+
                 let response = await fetch(this.restURI + "/total-page", {
                     method: "POST",
                     headers: {
                         "Accept": "application/json",
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify({ "count": 3 })
+                    body: JSON.stringify({
+                        "keywords": keywords,
+                        "options": {
+                            "count": 3
+                        }
+                    })
                 })
                 if (response.ok) {
                     r = await response.json()
@@ -94,6 +108,8 @@
                 }
             },
             async getData() {
+                this.getTotalPage()
+
                 let keywords = []
                 if (this.searchKeyword != "") {
                     keywords.push(
@@ -123,6 +139,12 @@
                     this.books = await response.json()
                 }
             },
+            async deleteData(idx) {
+                let response = await fetch(this.restURI + "/book/" + idx, { method: "DELETE" })
+                if (response.ok) {
+                    this.getData()
+                }
+            },
             movePage(page) {
                 // page 1 = idx 0
                 this.page.current = page
@@ -139,6 +161,7 @@
                 this.getData()
             },
             search() {
+                this.page.current = 1
                 this.getData()
             }
         }
