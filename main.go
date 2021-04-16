@@ -2,6 +2,7 @@ package main // import "bookshelf"
 
 import (
 	"embed"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -15,6 +16,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 
 	"book"
+	"consts"
 	"db"
 )
 
@@ -26,13 +28,44 @@ var (
 func setupDB() error {
 	var err error
 
-	db.Dsn, err = db.InitDB()
+	switch consts.DbInfo.Type {
+	case "mysql":
+		db.DBType = db.MYSQL
+		db.Dsn = fmt.Sprintf(
+			"%s:%s@tcp(%s:%d)/%s",
+			consts.DbInfo.User,
+			consts.DbInfo.Password,
+			consts.DbInfo.Server,
+			consts.DbInfo.Port,
+			consts.DbInfo.Database,
+		)
+		db.DatabaseName = consts.DbInfo.Database
+	case "sqlserver":
+		db.DBType = db.SQLSERVER
+		db.Dsn = fmt.Sprintf(
+			"%s:%s@tcp(%s:%d)/%s",
+			consts.DbInfo.User,
+			consts.DbInfo.Password,
+			consts.DbInfo.Server,
+			consts.DbInfo.Port,
+			consts.DbInfo.Database,
+		)
+		db.DatabaseName = consts.DbInfo.Database
+		db.TableName = db.DatabaseName + ".dbo." + db.TableName
+	case "sqlite":
+		db.DBType = db.SQLITE
+		db.Dsn = consts.DbInfo.Filename
+	default:
+		log.Fatal("nothing to support DB")
+	}
+
+	db.Dbi, err = db.InitDB(db.DBType)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("InitDB: ", err)
 	}
 
 	recreate := false
-	err = db.CreateTable(recreate)
+	err = db.Dbi.CreateTable(recreate)
 	if err != nil {
 		log.Fatal("CreateTable: ", err)
 	}

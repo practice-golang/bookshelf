@@ -3,23 +3,25 @@ package db
 import (
 	"database/sql"
 	"strings"
+	// _ "github.com/doug-martin/goqu/v9/dialect/sqlite3"
 )
 
-// InitDB - DB파일 생성
-func InitDB() (*sql.DB, error) {
-	var err error
-	fn := Filename
+type Sqlite struct{ Dsn string }
 
-	Dsn, err = sql.Open("sqlite", fn)
+// initDB - DB파일 생성
+func (d *Sqlite) initDB() (*sql.DB, error) {
+	var err error
+
+	Dbo, err = sql.Open("sqlite", d.Dsn)
 	if err != nil {
 		return nil, err
 	}
 
-	return Dsn, nil
+	return Dbo, nil
 }
 
 // CreateTable - 테이블 생성
-func CreateTable(recreate bool) error {
+func (d *Sqlite) CreateTable(recreate bool) error {
 	sql := ""
 	if recreate {
 		sql += `DROP TABLE IF EXISTS "#TABLE_NAME";`
@@ -36,7 +38,7 @@ func CreateTable(recreate bool) error {
 
 	sql = strings.ReplaceAll(sql, "#TABLE_NAME", TableName)
 
-	_, err := Dsn.Exec(sql)
+	_, err := Dbo.Exec(sql)
 	if err != nil {
 		return err
 	}

@@ -183,6 +183,11 @@
                 }
             },
             async addData(idx) {
+                if (Object.keys(this.bookAdd).length < 4) {
+                    swal.fire("Empty", "Fill all.", "warning")
+                    return false
+                }
+                console.log(this.bookAdd)
                 for (let k in this.bookAdd) {
                     if ((k != "idx") && (!this.bookAdd[k] == 0 && !this.bookAdd[k])) {
                         swal.fire("Empty", "Fill all.", "warning")

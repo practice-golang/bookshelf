@@ -141,6 +141,7 @@ content-type: application/json
 {
     "idx": "2",
     "name": "배트맨 다크 나이트 리턴즈 1",
+    "author": "프랭크 밀러",
     "price": "15000",
     "isbn": "9788983713971"
 }

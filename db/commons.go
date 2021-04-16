@@ -2,21 +2,48 @@ package db
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"models"
 
 	"github.com/doug-martin/goqu/v9"
+	_ "github.com/doug-martin/goqu/v9/dialect/mysql"
+	_ "github.com/doug-martin/goqu/v9/dialect/postgres"
+	_ "github.com/doug-martin/goqu/v9/dialect/sqlite3"
+	_ "github.com/doug-martin/goqu/v9/dialect/sqlserver"
 )
+
+func getDialect() (string, error) {
+	var dbType string
+
+	switch DBType {
+	case MYSQL:
+		dbType = "mysql"
+	case SQLSERVER:
+		dbType = "sqlserver"
+	case SQLITE:
+		dbType = "sqlite3"
+	default:
+		return dbType, errors.New("nothing to support DB")
+	}
+
+	return dbType, nil
+}
 
 // InsertData - Crud
 func InsertData(data interface{}) (sql.Result, error) {
-	dbms := goqu.New("sqlite3", Dsn)
+	dbType, err := getDialect()
+	if err != nil {
+		log.Println("ERR Select DBType: ", err)
+	}
+
+	dbms := goqu.New(dbType, Dbo)
 	ds := dbms.Insert(TableName).Rows(data)
 	sql, args, _ := ds.ToSQL()
 	log.Println(sql, args)
 
-	result, err := Dsn.Exec(sql)
+	result, err := Dbo.Exec(sql)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +56,12 @@ func SelectData(search interface{}) (interface{}, error) {
 	var result interface{}
 	var err error
 
-	dbms := goqu.New("sqlite3", Dsn)
+	dbType, err := getDialect()
+	if err != nil {
+		log.Println("ERR Select DBType: ", err)
+	}
+
+	dbms := goqu.New(dbType, Dbo)
 	ds := dbms.From(TableName).Select(search)
 
 	bookResult := []models.Book{}
@@ -95,17 +127,22 @@ func SelectData(search interface{}) (interface{}, error) {
 
 // UpdateData - crUd
 func UpdateData(data interface{}) (sql.Result, error) {
+	dbType, err := getDialect()
+	if err != nil {
+		log.Println("ERR Select DBType: ", err)
+	}
+
 	whereEXP, err := CheckValidAndPrepareWhere(data)
 	if err != nil {
 		return nil, err
 	}
 
-	dbms := goqu.New("sqlite3", Dsn)
+	dbms := goqu.New(dbType, Dbo)
 	ds := dbms.Update(TableName).Set(data).Where(whereEXP)
 	sql, args, _ := ds.ToSQL()
 	log.Println(sql, args)
 
-	result, err := Dsn.Exec(sql)
+	result, err := Dbo.Exec(sql)
 	if err != nil {
 		return nil, err
 	}
@@ -115,14 +152,19 @@ func UpdateData(data interface{}) (sql.Result, error) {
 
 // DeleteData - cruD
 func DeleteData(target, value string) (sql.Result, error) {
+	dbType, err := getDialect()
+	if err != nil {
+		log.Println("ERR Select DBType: ", err)
+	}
+
 	whereEXP := goqu.Ex{target: value}
 
-	dbms := goqu.New("sqlite3", Dsn)
+	dbms := goqu.New(dbType, Dbo)
 	ds := dbms.Delete(TableName).Where(whereEXP)
 	sql, args, _ := ds.ToSQL()
 	log.Println(sql, args)
 
-	result, err := Dsn.Exec(sql)
+	result, err := Dbo.Exec(sql)
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +176,12 @@ func DeleteData(target, value string) (sql.Result, error) {
 func SelectCount(search interface{}) (uint, error) {
 	var cnt uint
 
-	dbms := goqu.New("sqlite3", Dsn)
+	dbType, err := getDialect()
+	if err != nil {
+		log.Println("ERR Select DBType: ", err)
+	}
+
+	dbms := goqu.New(dbType, Dbo)
 	ds := dbms.From(TableName).Select(goqu.COUNT("*").As("PAGE_COUNT"))
 
 	switch search := search.(type) {
