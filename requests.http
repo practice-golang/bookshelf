@@ -78,6 +78,12 @@ content-type: application/json
         "isbn": "9788975070624"
     },
     {
+        "name": "질서 너머",
+        "price": "17800",
+        "author": "조던 피터슨",
+        "isbn": "9788901249599"
+    },
+    {
         "name": "흔한남매 7",
         "price": "10800",
         "author": "백난도",
@@ -100,6 +106,12 @@ content-type: application/json
         "price": "102400",
         "author": "김용",
         "isbn": "9788934985808"
+    },
+    {
+        "name": "주택과 세금",
+        "price": "7000",
+        "author": "국세청",
+        "isbn": "9791163060390"
     },
     {
         "name": "PSPICE for Circuit Theory and Electronic Devices",

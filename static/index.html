@@ -2,17 +2,41 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
     <!-- <script src="js/vue.min.js"></script> -->
     <!-- <script src="js/vue.js"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
+    <link rel="stylesheet" href="https://unpkg.com/sakura.css/css/sakura.css" type="text/css">
+
+    <style>
+        body {
+            margin: 0;
+            max-width: 100%;
+            width: 100%;
+        }
+
+        #app {
+            width: 100%;
+        }
+
+        table {
+            table-layout: fixed;
+            text-align: unset;
+        }
+    </style>
 </head>
 
 <body>
     <div id="app">
         <h1>Bookshelf</h1>
 
-        <label>찾기</label>:<input v-model="searchKeyword" @keyup.enter="search()" /><button @click="search()">검색</button>
+        <span>찾기:</span><input v-model="searchKeyword" @keyup.enter="search()" /><button @click="search()">검색</button>
+        <hr />
 
         <table>
             <thead>
@@ -26,20 +50,42 @@
                 </tr>
             </thead>
             <tbody>
+                <tr>
+                    <td>추가:</td>
+                    <td><input v-model="bookAdd.name" /></td>
+                    <td><input v-model="bookAdd.author" /></td>
+                    <td><input v-model="bookAdd.price" /></td>
+                    <td><input v-model="bookAdd.isbn" /></td>
+                    <td><button @click="addData()">추가</button></td>
+                </tr>
                 <template v-for="(b, i) in books">
-                    <tr>
+                    <tr v-if="b.idx == bookEdit.idx">
+                        <td>{{b.idx}}</td>
+                        <td><input v-model="bookEdit.name" /></td>
+                        <td><input v-model="bookEdit.author" /></td>
+                        <td><input v-model="bookEdit.price" /></td>
+                        <td><input v-model="bookEdit.isbn" /></td>
+                        <td>
+                            <button @click="bookEdit={}">취소</button>
+                            <button @click="updateData()">저장</button>
+                        </td>
+                    </tr>
+                    <tr v-else>
                         <td>{{b.idx}}</td>
                         <td>{{b.name}}</td>
                         <td>{{b.author}}</td>
                         <td>{{b.price}}</td>
                         <td>{{b.isbn}}</td>
-                        <td><button @click="deleteData(b.idx)">삭제</button></td>
+                        <td>
+                            <button @click="bookEdit=Object.assign({}, b)">편집</button>
+                            <button @click="deleteData(b.idx)">삭제</button>
+                        </td>
                     </tr>
                 </template>
             </tbody>
         </table>
-
         <hr />
+
         <template v-for="i in page.total">
             <template v-if="i == page.current">
                 &nbsp;<span><b>{{i}}</b></span>&nbsp;
@@ -48,7 +94,6 @@
                 &nbsp;<a href="javascript:" @click="movePage(i)">{{i}}</a>&nbsp;
             </template>
         </template>
-
 
     </div>
 </body>
@@ -64,14 +109,12 @@
                 countPerPage: 3,
                 order: "desc",
             },
-            books: [{
-                idx: 99,
-                name: "책제목",
-                author: "작가님",
-                price: 12345,
-                isbn: 1111111111113,
-            }],
+            books: [],
             searchKeyword: "",
+            bookAdd: {},
+            bookEditIdx: -1,
+            bookEdit: {},
+
         },
         mounted() {
             this.initData()
@@ -139,9 +182,96 @@
                     this.books = await response.json()
                 }
             },
+            async addData(idx) {
+                for (let k in this.bookAdd) {
+                    if ((k != "idx") && (!this.bookAdd[k] == 0 && !this.bookAdd[k])) {
+                        swal.fire("Empty", "Fill all.", "warning")
+                        return false
+                    }
+                    if ((k.match(/price|isbn/)) && (!Number.isFinite(parseFloat(this.bookAdd[k])))) {
+                        swal.fire("Number", "Price, ISBN have to be Number.", "warning")
+                        return false
+                    }
+                }
+
+                let response = await fetch(this.restURI + "/books", {
+                    method: "PUT",
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify([
+                        {
+                            "name": this.bookAdd.name,
+                            "price": parseFloat(this.bookAdd.price),
+                            "author": this.bookAdd.author,
+                            "isbn": this.bookAdd.isbn,
+                        },
+                    ])
+                })
+
+                if (response.ok) {
+                    this.getData()
+                    // this.bookAdd = { idx: "", name: "", author: "", price: null, isbn: null }
+                    this.bookAdd = {}
+                    swal.fire("Success", "Updated successfully", "success")
+                    return false
+                }
+
+                const status = response.status + " " + response.statusText
+                const msg = await response.text()
+                swal.fire(status, msg, "error")
+            },
+            async updateData() {
+                for (let k in this.bookEdit) {
+                    if ((k != "idx") && (!this.bookEdit[k] == 0 && !this.bookEdit[k])) {
+                        swal.fire("Empty", "Fill all.", "warning")
+                        return false
+                    }
+                    if ((k.match(/price|isbn/)) && (!Number.isFinite(parseFloat(this.bookEdit[k])))) {
+                        swal.fire("Number", "Price, ISBN have to be Number.", "warning")
+                        return false
+                    }
+                }
+
+                let response = await fetch(this.restURI + "/book", {
+                    method: "PATCH",
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(this.bookEdit)
+                })
+
+                if (response.ok) {
+                    this.getData()
+                    this.bookEditIdx = -1
+                    this.bookEdit = {}
+                    swal.fire("Success", "Updated successfully", "success")
+                    return false
+                }
+
+                const status = response.status + " " + response.statusText
+                const msg = await response.text()
+                swal.fire(status, msg, "error")
+            },
             async deleteData(idx) {
+                const confirm = await swal.fire({
+                    title: "Confirm",
+                    text: "Are you sure?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Delete",
+                    cancelButtonText: "Cancel"
+                })
+
+                if (!confirm.isConfirmed) {
+                    return false
+                }
+
                 let response = await fetch(this.restURI + "/book/" + idx, { method: "DELETE" })
                 if (response.ok) {
+                    swal.fire("Done", "Done to delete", "success")
                     this.getData()
                 }
             },

@@ -10,6 +10,3 @@ golang embed, doug-martin/goqu, cznic/sqlite CRUD
 * Read/Write test : `request.http`
 
 http://localhost:2918
-
-## Todo
-- [ ] 입력, 수정창
