@@ -15,3 +15,10 @@ golang embed, doug-martin/goqu, cznic/sqlite CRUD
 ## Start
 * Find and send request `### Add book #1` in `requests.http`
 * Open http://localhost:2918
+
+## Test
+* No. YOLO!😆
+
+## TODO
+- [ ] `oracle xe`
+- [ ] `consts` -> `ini`
