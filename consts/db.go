@@ -28,11 +28,11 @@ var (
 // 		User:     "root",
 // 		Password: "",
 // 		Database: "bookshelf",
-// 		Schema:   "",
 // 		Filename: "./bookshelf.db",
 // 	}
 // )
 
+// DB - ms-sqlserver
 // var (
 // 	DbInfo = DBpath{
 // 		Type:     "sqlserver", // "sqlite" "mysql" "postgres" "sqlserver"
@@ -41,6 +41,18 @@ var (
 // 		User:     "sa",
 // 		Password: "mssql",
 // 		Database: "bookshelf",
-// 		Schema:   "",
+// 	}
+// )
+
+// DB - postgresql
+// var (
+// 	DbInfo = DBpath{
+// 		Type:     "postgres", // "sqlite" "mysql" "postgres" "sqlserver"
+// 		Server:   "127.0.0.1",
+// 		Port:     5432,
+// 		User:     "root",
+// 		Password: "pgsql",
+// 		Database: "postgres",
+// 		Schema:   "bookshelf",
 // 	}
 // )

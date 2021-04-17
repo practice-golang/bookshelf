@@ -18,12 +18,14 @@ func getDialect() (string, error) {
 	var dbType string
 
 	switch DBType {
-	case MYSQL:
-		dbType = "mysql"
-	case SQLSERVER:
-		dbType = "sqlserver"
 	case SQLITE:
 		dbType = "sqlite3"
+	case MYSQL:
+		dbType = "mysql"
+	case POSTGRES:
+		dbType = "postgres"
+	case SQLSERVER:
+		dbType = "sqlserver"
 	default:
 		return dbType, errors.New("nothing to support DB")
 	}

@@ -20,19 +20,20 @@ func PrepareWhere(data interface{}) goqu.Ex {
 	for i := 0; i < values.NumField(); i++ {
 		f := values.Field(i).Interface()
 		b := dataReflect.Field(i)
-		jsonName := b.Tag.Get("json")
+		// dbName := b.Tag.Get("json")
+		dbName := b.Tag.Get("db")
 		switch f := f.(type) {
 		case null.String:
 			if f.Valid {
-				result[jsonName], _ = f.Value()
+				result[dbName], _ = f.Value()
 			}
 		case null.Int:
 			if f.Valid {
-				result[jsonName], _ = f.Value()
+				result[dbName], _ = f.Value()
 			}
 		case null.Float:
 			if f.Valid {
-				result[jsonName], _ = f.Value()
+				result[dbName], _ = f.Value()
 			}
 		}
 	}

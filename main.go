@@ -29,6 +29,9 @@ func setupDB() error {
 	var err error
 
 	switch consts.DbInfo.Type {
+	case "sqlite":
+		db.DBType = db.SQLITE
+		db.Dsn = consts.DbInfo.Filename
 	case "mysql":
 		db.DBType = db.MYSQL
 		db.Dsn = fmt.Sprintf(
@@ -40,21 +43,17 @@ func setupDB() error {
 			consts.DbInfo.Database,
 		)
 		db.DatabaseName = consts.DbInfo.Database
+	case "postgres":
+		db.DBType = db.POSTGRES
+		db.Dsn = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", consts.DbInfo.Server, consts.DbInfo.Port, consts.DbInfo.User, consts.DbInfo.Password, consts.DbInfo.Database)
+
+		db.DatabaseName = consts.DbInfo.Schema
+		db.TableName = db.DatabaseName + "." + db.TableName
 	case "sqlserver":
 		db.DBType = db.SQLSERVER
-		db.Dsn = fmt.Sprintf(
-			"%s:%s@tcp(%s:%d)/%s",
-			consts.DbInfo.User,
-			consts.DbInfo.Password,
-			consts.DbInfo.Server,
-			consts.DbInfo.Port,
-			consts.DbInfo.Database,
-		)
+		db.Dsn = fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", consts.DbInfo.User, consts.DbInfo.Password, consts.DbInfo.Server, consts.DbInfo.Port, consts.DbInfo.Database)
 		db.DatabaseName = consts.DbInfo.Database
 		db.TableName = db.DatabaseName + ".dbo." + db.TableName
-	case "sqlite":
-		db.DBType = db.SQLITE
-		db.Dsn = consts.DbInfo.Filename
 	default:
 		log.Fatal("nothing to support DB")
 	}

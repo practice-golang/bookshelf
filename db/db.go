@@ -42,27 +42,31 @@ var (
 // InitDB - DB 준비
 func InitDB(driver int) (DBI, error) {
 	var err error
-	var dbo DBI
+	var dbi DBI
 	once.Do(func() {
-		dbo, err = dbFactory(driver)
+		dbi, err = dbFactory(driver)
 	})
-	return dbo, err
+	return dbi, err
 }
 
 func dbFactory(driver int) (DBI, error) {
 	switch driver {
-	case MYSQL:
-		dbo := &Mysql{Dsn: Dsn}
-		dbo.initDB()
-		return dbo, nil
-	case SQLSERVER:
-		dbo := &Sqlserver{Dsn: Dsn}
-		dbo.initDB()
-		return dbo, nil
 	case SQLITE:
-		dbo := &Sqlite{Dsn: Dsn}
-		dbo.initDB()
-		return dbo, nil
+		dbi := &Sqlite{Dsn: Dsn}
+		dbi.initDB()
+		return dbi, nil
+	case MYSQL:
+		dbi := &Mysql{Dsn: Dsn}
+		dbi.initDB()
+		return dbi, nil
+	case SQLSERVER:
+		dbi := &Sqlserver{Dsn: Dsn}
+		dbi.initDB()
+		return dbi, nil
+	case POSTGRES:
+		dbi := &Postgres{Dsn: Dsn}
+		dbi.initDB()
+		return dbi, nil
 	default:
 		return nil, errors.New("nothing to support DB")
 	}
