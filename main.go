@@ -198,6 +198,6 @@ func main() {
 
 	e.Use(middleware.BodyDump(dumpHandler))
 
-	e.Logger.Fatal(e.Start(":2918"))
-	// e.Logger.Fatal(e.Start("127.0.0.1:2918"))
+	// e.Logger.Fatal(e.Start(":2918"))
+	e.Logger.Fatal(e.Start("127.0.0.1:2918"))
 }
