@@ -15,6 +15,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
+	"gopkg.in/ini.v1"
+
 	"book"
 	"consts"
 	"db"
@@ -23,6 +25,8 @@ import (
 var (
 	//go:embed static
 	content embed.FS
+	//go:embed samples/bookshelf.ini
+	sampleINI string
 )
 
 func setupDB() error {
@@ -122,8 +126,38 @@ func setupServer() *echo.Echo {
 }
 
 func main() {
-	var fileConnectionLog *os.File
 	var err error
+	cfg, err := ini.Load("bookshelf.ini")
+
+	if err != nil {
+		log.Print("Fail to read ini. ")
+
+		f, err := os.Create("bookshelf.ini")
+		if err != nil {
+			log.Fatal("Create INI: ", err)
+		}
+		defer f.Close()
+
+		_, err = f.WriteString(sampleINI + "\n")
+		if err != nil {
+			log.Fatal("Create INI: ", err)
+		}
+
+		log.Println("bookshelf.ini is created")
+	}
+
+	if cfg != nil {
+		consts.DbInfo.Type = cfg.Section("database").Key("DBTYPE").String()
+		consts.DbInfo.Server = cfg.Section("database").Key("ADDRESS").String()
+		consts.DbInfo.Port, _ = cfg.Section("database").Key("PORT").Int()
+		consts.DbInfo.User = cfg.Section("database").Key("USER").String()
+		consts.DbInfo.Password = cfg.Section("database").Key("PASSWORD").String()
+		consts.DbInfo.Database = cfg.Section("database").Key("DATABASE").String()
+		consts.DbInfo.Schema = cfg.Section("database").Key("SCHEMA").String()
+		consts.DbInfo.Filename = cfg.Section("database").Key("FILENAME").String()
+	}
+
+	var fileConnectionLog *os.File
 
 	db.UpdateScope = []string{"idx"}             // UPDATE ... WHERE idx=?
 	db.IgnoreScope = []string{"author", "price"} // Ignore if nil or null

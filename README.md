@@ -7,6 +7,9 @@ golang embed, doug-martin/goqu, cznic/sqlite CRUD
 * `make` -> `cd bin` -> `bookshelf` or `go build` -> `bookshelf` or `go run main.go`
 * Read/Write test : `requests.http`
 
+## Preference file
+* Once on `bookshelf` binary first run, `bookshelf.ini` which contain db connection will be created
+
 ## Database
 * Default is `sqlite`
 * See `consts/db.go` to choose one
@@ -16,9 +19,9 @@ golang embed, doug-martin/goqu, cznic/sqlite CRUD
 * Find and send request `### Add book #1` in `requests.http`
 * Open http://localhost:2918
 
-## Test
+## Test and Todo
 * No. YOLO!😆
 
-## TODO
-- [ ] `oracle xe`
-- [ ] `consts` -> `ini`
+
+## License
+Public domain
