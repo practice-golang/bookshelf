@@ -12,10 +12,10 @@ golang 1.16 embed, doug-martin/goqu, cznic/sqlite CRUD
 
 ## Database
 * Default set is `sqlite`
-* See `consts/db.go` to choose one
+* See `consts/db.go` or generated `bookshelf.ini`
   * `sqlite`, `mysql`, `sqlserver`, `postrges`
 
-## Init data & Open the webpage
+## Init sample data & Open the webpage
 * Find and send request `### Add book #1` in `requests.http`
 * Open http://localhost:2918
 
