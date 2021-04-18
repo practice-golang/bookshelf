@@ -1,6 +1,6 @@
 # Practice
 ```
-golang embed, doug-martin/goqu, cznic/sqlite CRUD
+golang 1.16 embed, doug-martin/goqu, cznic/sqlite CRUD
 ```
 
 ## Build & Run
@@ -11,7 +11,7 @@ golang embed, doug-martin/goqu, cznic/sqlite CRUD
 * Once on `bookshelf` binary first run, `bookshelf.ini` which contain db connection will be created
 
 ## Database
-* Default is `sqlite`
+* Default set is `sqlite`
 * See `consts/db.go` to choose one
   * `sqlite`, `mysql`, `sqlserver`, `postrges`
 
