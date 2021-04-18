@@ -15,9 +15,12 @@ golang 1.16 embed, doug-martin/goqu, cznic/sqlite CRUD
 * See `consts/db.go` to choose one
   * `sqlite`, `mysql`, `sqlserver`, `postrges`
 
-## Start
+## Init data & Open the webpage
 * Find and send request `### Add book #1` in `requests.http`
 * Open http://localhost:2918
+
+## Embeded html
+* `index.html` - Used `vue.js`, `sakura.css`
 
 ## Test and Todo
 * No. YOLO!😆
