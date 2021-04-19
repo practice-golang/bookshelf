@@ -35,28 +35,28 @@
     <div id="app">
         <h1>Bookshelf</h1>
 
-        <span>찾기:</span><input v-model="searchKeyword" @keyup.enter="search()" /><button @click="search()">검색</button>
+        <span>Search:</span><input v-model="searchKeyword" @keyup.enter="search()" /><button @click="search()">Find</button>
         <hr />
 
         <table>
             <thead>
                 <tr>
-                    <th @click="changeOrder()"><a href="javascript:">순번</a></th>
-                    <th>책이름</th>
-                    <th>저자</th>
-                    <th>가격</th>
+                    <th @click="changeOrder()"><a href="javascript:">Order</a></th>
+                    <th>Book Name</th>
+                    <th>Author</th>
+                    <th>Price</th>
                     <th>ISBN</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>추가:</td>
+                    <td>Add Book:</td>
                     <td><input v-model="bookAdd.name" /></td>
                     <td><input v-model="bookAdd.author" /></td>
                     <td><input v-model="bookAdd.price" /></td>
                     <td><input v-model="bookAdd.isbn" /></td>
-                    <td><button @click="addData()">추가</button></td>
+                    <td><button @click="addData()">Add</button></td>
                 </tr>
                 <template v-for="(b, i) in books">
                     <tr v-if="b.idx == bookEdit.idx">
@@ -66,8 +66,8 @@
                         <td><input v-model="bookEdit.price" /></td>
                         <td><input v-model="bookEdit.isbn" /></td>
                         <td>
-                            <button @click="bookEdit={}">취소</button>
-                            <button @click="updateData()">저장</button>
+                            <button @click="bookEdit={}">Cancel</button>
+                            <button @click="updateData()">Save</button>
                         </td>
                     </tr>
                     <tr v-else>
@@ -77,8 +77,8 @@
                         <td>{{b.price}}</td>
                         <td>{{b.isbn}}</td>
                         <td>
-                            <button @click="bookEdit=Object.assign({}, b)">편집</button>
-                            <button @click="deleteData(b.idx)">삭제</button>
+                            <button @click="bookEdit=Object.assign({}, b)">Edit</button>
+                            <button @click="deleteData(b.idx)">Delete</button>
                         </td>
                     </tr>
                 </template>
