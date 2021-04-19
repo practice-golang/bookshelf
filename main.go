@@ -1,4 +1,4 @@
-package main // import "bookshelf"
+package main // import "github.com/practice-golang/bookshelf"
 
 import (
 	"embed"
@@ -17,9 +17,9 @@ import (
 
 	"gopkg.in/ini.v1"
 
-	"book"
-	"consts"
-	"db"
+	"github.com/practice-golang/bookshelf/book"
+	"github.com/practice-golang/bookshelf/consts"
+	"github.com/practice-golang/bookshelf/db"
 )
 
 var (

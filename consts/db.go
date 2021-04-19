@@ -1,4 +1,4 @@
-package consts // import "consts"
+package consts
 
 type DBpath struct {
 	Type     string

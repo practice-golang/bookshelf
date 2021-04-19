@@ -4,6 +4,7 @@ golang 1.16 embed, doug-martin/goqu, cznic/sqlite CRUD
 ```
 
 ## Build & Run
+* `go get github.com/practice-golang/bookshelf`
 * `make` -> `cd bin` -> `bookshelf` or `go build` -> `bookshelf` or `go run main.go`
 * Read/Write test : `requests.http`
 

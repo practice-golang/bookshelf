@@ -1,4 +1,4 @@
-package db // import "db"
+package db
 
 import (
 	"database/sql"

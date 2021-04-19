@@ -1,4 +1,4 @@
-package models // import "models"
+package models
 
 import (
 	"gopkg.in/guregu/null.v4"

@@ -5,7 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"models"
+
+	"github.com/practice-golang/bookshelf/models"
 
 	"github.com/doug-martin/goqu/v9"
 	_ "github.com/doug-martin/goqu/v9/dialect/mysql"

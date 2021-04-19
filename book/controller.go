@@ -1,12 +1,14 @@
-package book // import "book"
+package book
 
 import (
-	"db"
 	"fmt"
 	"log"
 	"math"
-	"models"
 	"net/http"
+
+	"github.com/practice-golang/bookshelf/models"
+
+	"github.com/practice-golang/bookshelf/db"
 
 	"github.com/labstack/echo/v4"
 	"gopkg.in/guregu/null.v4"
