@@ -2,8 +2,7 @@ build:
 	go build -o bin/
 
 clean:
-	rm -f bin/bookshelf*
-	rm -f bin/*log
+	rm -rf ./bin
 
 test:
 	go test bookshelf book db
