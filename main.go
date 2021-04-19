@@ -39,14 +39,14 @@ func setupDB() error {
 	case "mysql":
 		db.DBType = db.MYSQL
 		db.Dsn = fmt.Sprintf(
-			"%s:%s@tcp(%s:%d)/%s",
+			"%s:%s@tcp(%s:%d)/",
 			consts.DbInfo.User,
 			consts.DbInfo.Password,
 			consts.DbInfo.Server,
 			consts.DbInfo.Port,
-			consts.DbInfo.Database,
 		)
 		db.DatabaseName = consts.DbInfo.Database
+		db.TableName = db.DatabaseName + "." + db.TableName
 	case "postgres":
 		db.DBType = db.POSTGRES
 		db.Dsn = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", consts.DbInfo.Server, consts.DbInfo.Port, consts.DbInfo.User, consts.DbInfo.Password, consts.DbInfo.Database)

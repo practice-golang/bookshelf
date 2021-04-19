@@ -128,7 +128,7 @@ func EditBook(c echo.Context) error {
 func DeleteBook(c echo.Context) error {
 	idx := c.Param("idx")
 
-	sqlResult, err := db.DeleteData("idx", idx)
+	sqlResult, err := db.DeleteData("IDX", idx)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}

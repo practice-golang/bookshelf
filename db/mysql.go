@@ -24,7 +24,14 @@ func (d *Mysql) initDB() (*sql.DB, error) {
 
 // CreateTable - Create table
 func (d *Mysql) CreateTable(recreate bool) error {
-	sql := ""
+	sql := `CREATE DATABASE IF NOT EXISTS #DATABASE_NAME;`
+	sql = strings.ReplaceAll(sql, "#DATABASE_NAME", DatabaseName)
+	_, err := Dbo.Exec(sql)
+	if err != nil {
+		return err
+	}
+
+	sql = ""
 	if recreate {
 		sql += `DROP TABLE IF EXISTS #TABLE_NAME;`
 	}
@@ -44,7 +51,7 @@ func (d *Mysql) CreateTable(recreate bool) error {
 
 	sql = strings.ReplaceAll(sql, "#TABLE_NAME", TableName)
 
-	_, err := Dbo.Exec(sql)
+	_, err = Dbo.Exec(sql)
 	if err != nil {
 		return err
 	}
