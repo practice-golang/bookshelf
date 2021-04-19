@@ -28,7 +28,6 @@ var (
 // 		User:     "root",
 // 		Password: "",
 // 		Database: "bookshelf",
-// 		Filename: "./bookshelf.db",
 // 	}
 // )
 
