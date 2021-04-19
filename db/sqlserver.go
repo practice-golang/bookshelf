@@ -10,7 +10,7 @@ import (
 
 type Sqlserver struct{ Dsn string }
 
-// initDB - DB파일 생성
+// initDB - Prepare DB
 func (d *Sqlserver) initDB() (*sql.DB, error) {
 	var err error
 
@@ -22,7 +22,7 @@ func (d *Sqlserver) initDB() (*sql.DB, error) {
 	return Dbo, nil
 }
 
-// CreateTable - 테이블 생성
+// CreateTable - Create table
 func (d *Sqlserver) CreateTable(recreate bool) error {
 	sql := `
 	USE master

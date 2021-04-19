@@ -159,8 +159,8 @@ func main() {
 
 	var fileConnectionLog *os.File
 
-	db.UpdateScope = []string{"idx"}             // UPDATE ... WHERE idx=?
-	db.IgnoreScope = []string{"author", "price"} // Ignore if nil or null
+	db.UpdateScope = []string{"IDX"}             // UPDATE ... WHERE IDX=?
+	db.IgnoreScope = []string{"AUTHOR", "PRICE"} // Ignore if nil or null
 	db.OrderScope = "IDX"
 
 	err = setupDB()

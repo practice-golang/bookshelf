@@ -15,6 +15,6 @@ type Book struct {
 
 // BookSearch - Search
 type BookSearch struct {
-	Keywords []Book  `json:"keywords" db:"-"` // 검색 키워드
-	Options  Options `json:"options" db:"-"`  // 페이징, 검색 옵션 and/or
+	Keywords []Book  `json:"keywords" db:"-"` // Search keywords
+	Options  Options `json:"options" db:"-"`  // Paging, options for search (eg. and/or)
 }

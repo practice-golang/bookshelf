@@ -10,7 +10,7 @@ import (
 
 type Mysql struct{ Dsn string }
 
-// initDB - DB파일 생성
+// initDB - Prepare DB
 func (d *Mysql) initDB() (*sql.DB, error) {
 	var err error
 
@@ -22,7 +22,7 @@ func (d *Mysql) initDB() (*sql.DB, error) {
 	return Dbo, nil
 }
 
-// CreateTable - 테이블 생성
+// CreateTable - Create table
 func (d *Mysql) CreateTable(recreate bool) error {
 	sql := ""
 	if recreate {

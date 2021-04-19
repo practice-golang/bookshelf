@@ -33,13 +33,13 @@ var (
 	TableName    = "books"
 	Dbo          *sql.DB
 	DBType       int
-	UpdateScope  []string     // UPDATE ... WHERE idx=?
+	UpdateScope  []string     // UPDATE ... WHERE IDX=?
 	IgnoreScope  []string     // Ignore if nil or null
 	listCount    uint     = 3 // Default list count
 	OrderScope   string       // Default order column name
 )
 
-// InitDB - DB 준비
+// InitDB - Prepare DB
 func InitDB(driver int) (DBI, error) {
 	var err error
 	var dbi DBI

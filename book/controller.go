@@ -12,7 +12,7 @@ import (
 	"gopkg.in/guregu/null.v4"
 )
 
-// AddBooks - 책정보 입력
+// AddBooks - Insert book(s) info
 func AddBooks(c echo.Context) error {
 	var books []models.Book
 
@@ -36,7 +36,7 @@ func AddBooks(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
-// GetBook - 책정보 한개 취득
+// GetBook - Get a book info
 func GetBook(c echo.Context) error {
 	idx := c.Param("idx")
 	// var data interface{}
@@ -59,7 +59,7 @@ func GetBook(c echo.Context) error {
 	return c.JSON(http.StatusOK, data)
 }
 
-// GetBooks - 책정보 취득 검색
+// GetBooks - Get all(but limit 10 by db.SelectData) books info
 func GetBooks(c echo.Context) error {
 	// var data interface{}
 	var data []models.Book
@@ -77,7 +77,7 @@ func GetBooks(c echo.Context) error {
 	return c.JSON(http.StatusOK, data)
 }
 
-// SearchBooks - 책정보 검색 또는 페이징
+// SearchBooks - Search book(s) info or paging
 func SearchBooks(c echo.Context) error {
 	var data []models.Book
 	var search models.BookSearch
@@ -100,7 +100,7 @@ func SearchBooks(c echo.Context) error {
 	return c.JSON(http.StatusOK, data)
 }
 
-// EditBook - 책정보 수정
+// EditBook - Edit book info
 func EditBook(c echo.Context) error {
 	var book models.Book
 
@@ -124,7 +124,7 @@ func EditBook(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
-// DeleteBook - 책 1개 삭제
+// DeleteBook - Delete an item of books info
 func DeleteBook(c echo.Context) error {
 	idx := c.Param("idx")
 
@@ -144,7 +144,7 @@ func DeleteBook(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
-// GetTotalPage - 전체 페이지 취득
+// GetTotalPage - Get total page
 func GetTotalPage(c echo.Context) error {
 	var search models.BookSearch
 

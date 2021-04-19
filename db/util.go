@@ -10,7 +10,7 @@ import (
 	"gopkg.in/guregu/null.v4"
 )
 
-// PrepareWhere - Where 요소 준비
+// PrepareWhere - Prepare where condition for search
 func PrepareWhere(data interface{}) goqu.Ex {
 	result := goqu.Ex{}
 
@@ -43,7 +43,7 @@ func PrepareWhere(data interface{}) goqu.Ex {
 	return result
 }
 
-// CheckValidAndPrepareWhere - 빠진 요소 체크, Where 요소 준비
+// CheckValidAndPrepareWhere - Prepare where and check missing values for update
 func CheckValidAndPrepareWhere(book interface{}) (goqu.Ex, error) {
 	result := goqu.Ex{}
 
@@ -54,28 +54,29 @@ func CheckValidAndPrepareWhere(book interface{}) (goqu.Ex, error) {
 		f := values.Field(i).Interface()
 		b := bookReflect.Field(i)
 		// log.Println(b.Name)
-		jsonName := b.Tag.Get("json")
+		// dbName := b.Tag.Get("json")
+		dbName := b.Tag.Get("db")
 		switch f := f.(type) {
 		case null.String:
 			if !f.Valid {
-				return nil, errors.New("`" + jsonName + "` must have a value")
+				return nil, errors.New("`" + dbName + "` must have a value")
 			}
-			if funk.Contains(UpdateScope, jsonName) {
-				result[jsonName], _ = f.Value()
+			if funk.Contains(UpdateScope, dbName) {
+				result[dbName], _ = f.Value()
 			}
 		case null.Int:
 			if !f.Valid {
-				return nil, errors.New("`" + jsonName + "` must have a value")
+				return nil, errors.New("`" + dbName + "` must have a value")
 			}
-			if funk.Contains(UpdateScope, jsonName) {
-				result[jsonName], _ = f.Value()
+			if funk.Contains(UpdateScope, dbName) {
+				result[dbName], _ = f.Value()
 			}
 		case null.Float:
 			if !f.Valid {
-				return nil, errors.New("`" + jsonName + "` must have a value")
+				return nil, errors.New("`" + dbName + "` must have a value")
 			}
-			if funk.Contains(UpdateScope, jsonName) {
-				result[jsonName], _ = f.Value()
+			if funk.Contains(UpdateScope, dbName) {
+				result[dbName], _ = f.Value()
 			}
 		}
 	}

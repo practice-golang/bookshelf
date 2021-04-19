@@ -1,7 +1,6 @@
 @uri=http://localhost:2918
 
 
-
 ### Select one
 GET {{uri}}/book/1 HTTP/1.1
 
@@ -27,7 +26,7 @@ content-type: application/json
 }
 
 
-### Paging - 아래 Search에서 keyword만 제외
+### Paging - Same as below search except keywords
 POST {{uri}}/books HTTP/1.1
 content-type: application/json
 
@@ -43,14 +42,14 @@ content-type: application/json
 
 ### Search
 ### keywords -> book{name and author and price ...} or book{name and author and price} ...
-### book 내부는 and, book끼리는 or
+### Use and inside book, use or each books
 POST {{uri}}/books HTTP/1.1
 content-type: application/json
 
 {
     "keywords": [
         {
-            "author": "칼 세이건"
+            "author": "Carl Edward Sagan"
         },
         {
             "author": "김용"
@@ -72,16 +71,16 @@ content-type: application/json
 
 [
     {
-        "name": "데일 카네기 인간관계론",
-        "price": "13000",
-        "author": "데일 카네기",
-        "isbn": "9788975070624"
+        "name": "The Quick and Easy Way to Effective Speaking",
+        "price": "10.99",
+        "author": "Dale Carnegie",
+        "isbn": "9780671724009"
     },
     {
-        "name": "질서 너머",
-        "price": "17800",
-        "author": "조던 피터슨",
-        "isbn": "9788901249599"
+        "name": "Beyond Order: 12 More Rules for Life",
+        "price": "31.95",
+        "author": "Jordan B. Peterson",
+        "isbn": "9780593084649"
     },
     {
         "name": "흔한남매 7",
@@ -90,10 +89,10 @@ content-type: application/json
         "isbn": "9791164137527"
     },
     {
-        "name": "코스모스",
-        "price": "16650",
-        "author": "칼 세이건",
-        "isbn": "9788983711892"
+        "name": "Cosmos",
+        "price": "19.05",
+        "author": "Carl Edward Sagan",
+        "isbn": "9780375508325"
     },
     {
         "name": "사조영웅전",
@@ -140,10 +139,10 @@ content-type: application/json
 
 {
     "idx": "2",
-    "name": "배트맨 다크 나이트 리턴즈 1",
-    "author": "프랭크 밀러",
-    "price": "15000",
-    "isbn": "9788983713971"
+    "name": "Batman: The Dark Knight Returns",
+    "author": "Frank Miller",
+    "price": "17.33",
+    "isbn": "9781563893421"
 }
 
 ### DELETE book
