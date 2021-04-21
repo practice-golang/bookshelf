@@ -8,55 +8,42 @@
     <!-- <script src="js/vue.min.js"></script> -->
     <!-- <script src="js/vue.js"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/vue-i18n@8"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
     <link rel="stylesheet" href="https://unpkg.com/sakura.css/css/sakura.css" type="text/css">
-
-    <style>
-        body {
-            margin: 0;
-            max-width: 100%;
-            width: 100%;
-        }
-
-        #app {
-            width: 100%;
-        }
-
-        table {
-            table-layout: fixed;
-            text-align: unset;
-        }
-    </style>
 </head>
 
 <body>
     <div id="app">
         <h1>Bookshelf</h1>
 
-        <span>Search:</span><input v-model="searchKeyword" @keyup.enter="search()" /><button @click="search()">Find</button>
+        <button @click="setLocale('en')">English</button>&nbsp;<button @click="setLocale('ko')">한국어</button>
+        <br />
+
+        <span>{{ $t("elem.search") }}:</span><input v-model="searchKeyword" @keyup.enter="search()" /><button @click="search()">{{ $t("elem.find") }}</button>
         <hr />
 
         <table>
             <thead>
                 <tr>
-                    <th @click="changeOrder()"><a href="javascript:">Order</a></th>
-                    <th>Book Name</th>
-                    <th>Author</th>
-                    <th>Price</th>
+                    <th @click="changeOrder()"><a href="javascript:">{{ $t("table.order") }}</a></th>
+                    <th>{{ $t("table.bookname") }}</th>
+                    <th>{{ $t("table.author") }}</th>
+                    <th>{{ $t("table.price") }}</th>
                     <th>ISBN</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>Add Book:</td>
+                    <td>{{ $t("elem.addbook") }}:</td>
                     <td><input v-model="bookAdd.name" /></td>
                     <td><input v-model="bookAdd.author" /></td>
                     <td><input v-model="bookAdd.price" /></td>
                     <td><input v-model="bookAdd.isbn" /></td>
-                    <td><button @click="addData()">Add</button></td>
+                    <td><button @click="addData()">{{ $t("elem.add") }}</button></td>
                 </tr>
                 <template v-for="(b, i) in books">
                     <tr v-if="b.idx == bookEdit.idx">
@@ -66,8 +53,8 @@
                         <td><input v-model="bookEdit.price" /></td>
                         <td><input v-model="bookEdit.isbn" /></td>
                         <td>
-                            <button @click="bookEdit={}">Cancel</button>
-                            <button @click="updateData()">Save</button>
+                            <button @click="bookEdit={}">{{ $t("elem.cancel") }}</button>
+                            <button @click="updateData()">{{ $t("elem.save") }}</button>
                         </td>
                     </tr>
                     <tr v-else>
@@ -77,8 +64,8 @@
                         <td>{{b.price}}</td>
                         <td>{{b.isbn}}</td>
                         <td>
-                            <button @click="bookEdit=Object.assign({}, b)">Edit</button>
-                            <button @click="deleteData(b.idx)">Delete</button>
+                            <button @click="bookEdit=Object.assign({}, b)">{{ $t("elem.edit") }}</button>
+                            <button @click="deleteData(b.idx)">{{ $t("elem.delete") }}</button>
                         </td>
                     </tr>
                 </template>
@@ -99,7 +86,52 @@
 </body>
 
 <script>
+    const messages = {
+        en: {
+            table: {
+                order: "Order",
+                bookname: "Book Name",
+                author: "Author",
+                price: "Price",
+            },
+            elem: {
+                addbook: "Add book",
+                search: "Search",
+                find: "Find",
+                add: "Add",
+                edit: "Edit",
+                delete: "Delete",
+                cancel: "Cancel",
+                save: "Save",
+            }
+        },
+        ko: {
+            table: {
+                order: "순번",
+                bookname: "책 제목",
+                author: "작가",
+                price: "가격",
+            },
+            elem: {
+                addbook: "책 추가",
+                search: "찾기",
+                find: "검색",
+                add: "추가",
+                edit: "수정",
+                delete: "삭제",
+                cancel: "취소",
+                save: "저장",
+            }
+        }
+    }
+
+    const i18n = new VueI18n({
+        locale: 'en',
+        messages,
+    })
+
     const vm = new Vue({
+        i18n,
         el: "#app",
         data: {
             // restURI: "http://localhost:2918",
@@ -121,6 +153,9 @@
             this.initData()
         },
         methods: {
+            setLocale(lang) {
+                i18n.locale = lang
+            },
             initData() {
                 this.getData()
             },
@@ -303,5 +338,22 @@
         }
     })
 </script>
+
+<style>
+    body {
+        margin: 0;
+        max-width: 100%;
+        width: 100%;
+    }
+
+    #app {
+        width: 100%;
+    }
+
+    table {
+        table-layout: fixed;
+        text-align: unset;
+    }
+</style>
 
 </html>
