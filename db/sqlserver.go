@@ -22,6 +22,10 @@ func (d *Sqlserver) initDB() (*sql.DB, error) {
 	return Dbo, nil
 }
 
+func (d *Sqlserver) CreateDB() error {
+	return nil
+}
+
 // CreateTable - Create table
 func (d *Sqlserver) CreateTable(recreate bool) error {
 	sql := `

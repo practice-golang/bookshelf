@@ -3,7 +3,6 @@ package db
 import (
 	"database/sql"
 	"errors"
-	"sync"
 )
 
 const (
@@ -21,14 +20,15 @@ const (
 type (
 	DBI interface {
 		initDB() (*sql.DB, error)
+		CreateDB() error
 		CreateTable(bool) error
 	}
 )
 
 var (
-	Dbi          DBI    // DB Object Interface
-	Dsn          string // Data Source Name
-	once         sync.Once
+	Dbi DBI    // DB Object Interface
+	Dsn string // Data Source Name
+	// once         sync.Once
 	DatabaseName = "bookshelf"
 	TableName    = "books"
 	Dbo          *sql.DB
@@ -43,9 +43,9 @@ var (
 func InitDB(driver int) (DBI, error) {
 	var err error
 	var dbi DBI
-	once.Do(func() {
-		dbi, err = dbFactory(driver)
-	})
+
+	dbi, err = dbFactory(driver)
+
 	return dbi, err
 }
 

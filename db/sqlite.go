@@ -20,6 +20,10 @@ func (d *Sqlite) initDB() (*sql.DB, error) {
 	return Dbo, nil
 }
 
+func (d *Sqlite) CreateDB() error {
+	return nil
+}
+
 // CreateTable - Create table
 func (d *Sqlite) CreateTable(recreate bool) error {
 	sql := ""

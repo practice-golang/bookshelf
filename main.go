@@ -10,12 +10,12 @@ import (
 
 	"time"
 
-	_ "modernc.org/sqlite"
-
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
 	"gopkg.in/ini.v1"
+
+	_ "modernc.org/sqlite"
 
 	"github.com/practice-golang/bookshelf/book"
 	"github.com/practice-golang/bookshelf/consts"
@@ -31,32 +31,46 @@ var (
 
 func setupDB() error {
 	var err error
+	info := consts.DbInfo
 
 	switch consts.DbInfo.Type {
 	case "sqlite":
 		db.DBType = db.SQLITE
-		db.Dsn = consts.DbInfo.Filename
+		db.Dsn = info.Filename
 	case "mysql":
 		db.DBType = db.MYSQL
-		db.Dsn = fmt.Sprintf(
-			"%s:%s@tcp(%s:%d)/",
-			consts.DbInfo.User,
-			consts.DbInfo.Password,
-			consts.DbInfo.Server,
-			consts.DbInfo.Port,
-		)
-		db.DatabaseName = consts.DbInfo.Database
+		db.Dsn = fmt.Sprintf("%s:%s@tcp(%s:%d)/",
+			info.User, info.Password, info.Server, info.Port)
+		db.DatabaseName = info.Database
 		db.TableName = db.DatabaseName + "." + db.TableName
 	case "postgres":
 		db.DBType = db.POSTGRES
-		db.Dsn = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", consts.DbInfo.Server, consts.DbInfo.Port, consts.DbInfo.User, consts.DbInfo.Password, consts.DbInfo.Database)
 
-		db.DatabaseName = consts.DbInfo.Schema
+		// DB creation
+		if info.Database != "postgres" {
+			db.Dsn = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=postgres sslmode=disable",
+				info.Server, info.Port, info.User, info.Password)
+			db.Dbi, err = db.InitDB(db.DBType)
+			if err != nil {
+				log.Fatal("InitDB - CreateDB: ", err)
+			}
+			err = db.Dbi.CreateDB()
+			if err != nil {
+				log.Println("Create DB (ignore this if msg is already exists): ", err)
+			}
+			db.Dbo.Close()
+		}
+
+		db.Dsn = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+			info.Server, info.Port, info.User, info.Password, info.Database)
+
+		db.DatabaseName = info.Schema
 		db.TableName = db.DatabaseName + "." + db.TableName
 	case "sqlserver":
 		db.DBType = db.SQLSERVER
-		db.Dsn = fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", consts.DbInfo.User, consts.DbInfo.Password, consts.DbInfo.Server, consts.DbInfo.Port, consts.DbInfo.Database)
-		db.DatabaseName = consts.DbInfo.Database
+		db.Dsn = fmt.Sprintf("%s:%s@tcp(%s:%d)/%s",
+			info.User, info.Password, info.Server, info.Port, info.Database)
+		db.DatabaseName = info.Database
 		db.TableName = db.DatabaseName + ".dbo." + db.TableName
 	default:
 		log.Fatal("nothing to support DB")

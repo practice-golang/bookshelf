@@ -22,6 +22,18 @@ func (d *Postgres) initDB() (*sql.DB, error) {
 	return Dbo, nil
 }
 
+func (d *Postgres) CreateDB() error {
+	sql := `CREATE DATABASE #DATABASE_NAME;`
+	sql = strings.ReplaceAll(sql, "#DATABASE_NAME", DatabaseName)
+
+	_, err := Dbo.Exec(sql)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // CreateTable - Create table
 func (d *Postgres) CreateTable(recreate bool) error {
 	sql := `CREATE SCHEMA IF NOT EXISTS #SCHEMA_NAME;`

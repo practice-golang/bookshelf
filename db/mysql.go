@@ -22,6 +22,10 @@ func (d *Mysql) initDB() (*sql.DB, error) {
 	return Dbo, nil
 }
 
+func (d *Mysql) CreateDB() error {
+	return nil
+}
+
 // CreateTable - Create table
 func (d *Mysql) CreateTable(recreate bool) error {
 	sql := `CREATE DATABASE IF NOT EXISTS #DATABASE_NAME;`
