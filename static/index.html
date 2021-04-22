@@ -46,7 +46,7 @@
                     <td><button @click="addData()">{{ $t("elem.add") }}</button></td>
                 </tr>
                 <template v-for="(b, i) in books">
-                    <tr v-if="b.idx == bookEdit.idx">
+                    <tr v-if="b.idx == bookEdit.idx" @keyup.enter="updateData()">
                         <td>{{b.idx}}</td>
                         <td><input v-model="bookEdit.name" /></td>
                         <td><input v-model="bookEdit.author" /></td>
@@ -145,9 +145,8 @@
             books: [],
             searchKeyword: "",
             bookAdd: {},
-            bookEditIdx: -1,
+            bookEditIdx: -1, // not use
             bookEdit: {},
-
         },
         mounted() {
             this.initData()
@@ -187,6 +186,8 @@
                 }
             },
             async getData() {
+                this.bookEdit = {}
+                
                 this.getTotalPage()
 
                 let keywords = []
@@ -231,7 +232,7 @@
                         swal.fire("Empty", "Fill all.", "warning")
                         return false
                     }
-                    if ((k.match(/price|isbn/)) && (this.bookEdit[k] == parseFloat(this.bookEdit[k]))) {
+                    if ((k.match(/price|isbn/)) && (this.bookEdit[k] != parseFloat(this.bookEdit[k]))) {
                         swal.fire("Number", "Price, ISBN have to be Number.", "warning")
                         return false
                     }
@@ -273,7 +274,7 @@
                         swal.fire("Empty", "Fill all.", "warning")
                         return false
                     }
-                    if ((k.match(/price|isbn/)) && (this.bookEdit[k] == parseFloat(this.bookEdit[k]))) {
+                    if ((k.match(/price|isbn/)) && (this.bookEdit[k] != parseFloat(this.bookEdit[k]))) {
                         swal.fire("Number", "Price, ISBN have to be Number.", "warning")
                         return false
                     }
@@ -290,8 +291,6 @@
 
                 if (response.ok) {
                     this.getData()
-                    this.bookEditIdx = -1
-                    this.bookEdit = {}
                     swal.fire("Success", "Updated successfully", "success")
                     return false
                 }
