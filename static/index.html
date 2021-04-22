@@ -6,13 +6,19 @@
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 
     <!-- <script src="js/vue.min.js"></script> -->
-    <!-- <script src="js/vue.js"></script> -->
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="js/vue.js"></script>
+    <script src="js/vue-i18n.js"></script>
+    <script src="js/sweetalert2.all.min.js"></script>
+    
+    <link rel="stylesheet" href="css/sakura.css" type="text/css">
+    <link rel="stylesheet" href="css/normalize.css" type="text/css">
+
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://unpkg.com/vue-i18n@8"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
-    <link rel="stylesheet" href="https://unpkg.com/sakura.css/css/sakura.css" type="text/css">
+    <link rel="stylesheet" href="https://unpkg.com/sakura.css/css/sakura.css" type="text/css"> -->
 </head>
 
 <body>
@@ -20,8 +26,7 @@
         <h1>Bookshelf</h1>
 
         <button @click="setLocale('en')">English</button>&nbsp;<button @click="setLocale('ko')">한국어</button>
-        <br />
-
+        <span></span>
         <span>{{ $t("elem.search") }}:</span><input v-model="searchKeyword" @keyup.enter="search()" /><button @click="search()">{{ $t("elem.find") }}</button>
         <hr />
 
@@ -345,8 +350,8 @@
 <style>
     body {
         margin: 0;
+        padding: 0;
         max-width: 100%;
-        width: 100%;
     }
 
     #app {
@@ -356,6 +361,10 @@
     table {
         table-layout: fixed;
         text-align: unset;
+    }
+
+    td {
+        text-align: center;
     }
 </style>
 
