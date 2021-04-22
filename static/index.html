@@ -219,17 +219,19 @@
                 }
             },
             async addData(idx) {
+                console.log(this.bookAdd)
+
                 if (Object.keys(this.bookAdd).length < 4) {
                     swal.fire("Empty", "Fill all.", "warning")
                     return false
                 }
-                console.log(this.bookAdd)
+
                 for (let k in this.bookAdd) {
                     if ((k != "idx") && (!this.bookAdd[k] == 0 && !this.bookAdd[k])) {
                         swal.fire("Empty", "Fill all.", "warning")
                         return false
                     }
-                    if ((k.match(/price|isbn/)) && (!Number.isFinite(parseFloat(this.bookAdd[k])))) {
+                    if ((k.match(/price|isbn/)) && (this.bookEdit[k] == parseFloat(this.bookEdit[k]))) {
                         swal.fire("Number", "Price, ISBN have to be Number.", "warning")
                         return false
                     }
@@ -264,12 +266,14 @@
                 swal.fire(status, msg, "error")
             },
             async updateData() {
+                console.log(this.bookEdit)
+
                 for (let k in this.bookEdit) {
                     if ((k != "idx") && (!this.bookEdit[k] == 0 && !this.bookEdit[k])) {
                         swal.fire("Empty", "Fill all.", "warning")
                         return false
                     }
-                    if ((k.match(/price|isbn/)) && (!Number.isFinite(parseFloat(this.bookEdit[k])))) {
+                    if ((k.match(/price|isbn/)) && (this.bookEdit[k] == parseFloat(this.bookEdit[k]))) {
                         swal.fire("Number", "Price, ISBN have to be Number.", "warning")
                         return false
                     }
