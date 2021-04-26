@@ -237,7 +237,8 @@
                         swal.fire("Empty", "Fill all.", "warning")
                         return false
                     }
-                    if ((k.match(/price|isbn/)) && (this.bookEdit[k] != parseFloat(this.bookEdit[k]))) {
+                    console.log(this.bookAdd[k] != parseFloat(this.bookAdd[k]), this.bookAdd[k], parseFloat(this.bookAdd[k]))
+                    if ((k.match(/price|isbn/)) && (this.bookAdd[k] != String(parseFloat(this.bookAdd[k])))) {
                         swal.fire("Number", "Price, ISBN have to be Number.", "warning")
                         return false
                     }
@@ -279,6 +280,7 @@
                         swal.fire("Empty", "Fill all.", "warning")
                         return false
                     }
+                    console.log(this.bookEdit[k] != parseFloat(this.bookEdit[k]), this.bookEdit[k], parseFloat(this.bookEdit[k]))
                     if ((k.match(/price|isbn/)) && (this.bookEdit[k] != parseFloat(this.bookEdit[k]))) {
                         swal.fire("Number", "Price, ISBN have to be Number.", "warning")
                         return false
