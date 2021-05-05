@@ -2,13 +2,13 @@
 
 
 ### Select All - Map
-GET {{uri}}/boards-map HTTP/1.1
+GET {{uri}}/books-map HTTP/1.1
 
 
 ### Search MAP
 ### keywords -> board{name and author and price ...} or board{name and author and price} ...
 ### Use and inside board, use or each boards
-POST {{uri}}/boards-map HTTP/1.1
+POST {{uri}}/books-map HTTP/1.1
 content-type: application/json
 
 {
@@ -28,4 +28,72 @@ content-type: application/json
         "page": 0,
         "count": 3
     }
+}
+
+
+### Add book MAP
+PUT {{uri}}/books-map HTTP/1.1
+content-type: application/json
+
+[
+    {
+        "name": "The Quick and Easy Way to Effective Speaking",
+        "price": "10.99",
+        "author": "Dale Carnegie",
+        "isbn": "9780671724009"
+    },
+    {
+        "name": "Beyond Order: 12 More Rules for Life",
+        "price": "31.95",
+        "author": "Jordan B. Peterson",
+        "isbn": "9780593084649"
+    },
+    {
+        "name": "흔한남매 7",
+        "price": "10800",
+        "author": "백난도",
+        "isbn": "9791164137527"
+    },
+    {
+        "name": "Cosmos",
+        "price": "19.05",
+        "author": "Carl Edward Sagan",
+        "isbn": "9780375508325"
+    },
+    {
+        "name": "사조영웅전",
+        "price": "65000",
+        "author": "김용",
+        "isbn": "9788934987475"
+    },
+    {
+        "name": "신조협려",
+        "price": "102400",
+        "author": "김용",
+        "isbn": "9788934985808"
+    },
+    {
+        "name": "주택과 세금",
+        "price": "7000",
+        "author": "국세청",
+        "isbn": "9791163060390"
+    },
+    {
+        "name": "PSPICE for Circuit Theory and Electronic Devices",
+        "price": "57000",
+        "author": "Tobin, Paul",
+        "isbn": "9781598291568"
+    }
+]
+
+### Edit book
+PATCH {{uri}}/book-map HTTP/1.1
+content-type: application/json
+
+{
+    "idx": "2",
+    "name": "Batman: The Dark Knight Returns",
+    "author": "Frank Miller",
+    "price": "17.33",
+    "isbn": "9781563893421"
 }

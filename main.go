@@ -134,8 +134,10 @@ func setupServer() *echo.Echo {
 	e.PATCH("/book", book.EditBook)
 	e.DELETE("/book/:idx", book.DeleteBook)
 
-	e.GET("/boards-map", book.GetBooksMAP)
-	e.POST("/boards-map", book.SearchBooksMAP)
+	e.GET("/books-map", book.GetBooksMAP)
+	e.POST("/books-map", book.SearchBooksMAP)
+	e.PUT("/books-map", book.AddBooksMAP)
+	e.PATCH("/book-map", book.EditBookMAP)
 
 	e.POST("/total-page", book.GetTotalPage)
 
@@ -176,7 +178,7 @@ func main() {
 
 	var fileConnectionLog *os.File
 
-	db.UpdateScope = []string{"IDX"}             // UPDATE ... WHERE IDX=?
+	db.UpdateScope = []string{"idx", "IDX"}      // UPDATE ... WHERE IDX=?
 	db.IgnoreScope = []string{"AUTHOR", "PRICE"} // Ignore if nil or null
 	db.OrderScope = "IDX"
 

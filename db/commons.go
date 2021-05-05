@@ -7,6 +7,7 @@ import (
 	"log"
 
 	"github.com/practice-golang/bookshelf/models"
+	"github.com/thoas/go-funk"
 	"github.com/tidwall/gjson"
 
 	"github.com/doug-martin/goqu/v9"
@@ -44,6 +45,44 @@ func InsertData(data interface{}) (sql.Result, error) {
 
 	dbms := goqu.New(dbType, Dbo)
 	ds := dbms.Insert(TableName).Rows(data)
+	sql, args, _ := ds.ToSQL()
+	log.Println(sql, args)
+
+	result, err := Dbo.Exec(sql)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// InsertDataMAP - Crud
+func InsertDataMAP(data interface{}) (sql.Result, error) {
+	rcds := []goqu.Record{}
+	if data != nil {
+		jsonBody, ok := gjson.Parse(string(data.([]byte))).Value().([]interface{})
+		if !ok {
+			log.Println("Cannot parse jsonBody")
+		}
+
+		for i, d := range jsonBody {
+			log.Println(i, d)
+			rcd := goqu.Record{}
+			for j, v := range d.(map[string]interface{}) {
+				rcd[j] = v
+			}
+			rcds = append(rcds, rcd)
+		}
+
+	}
+
+	dbType, err := getDialect()
+	if err != nil {
+		log.Println("ERR Select DBType: ", err)
+	}
+
+	dbms := goqu.New(dbType, Dbo)
+	ds := dbms.Insert(TableName).Rows(rcds)
 	sql, args, _ := ds.ToSQL()
 	log.Println(sql, args)
 
@@ -233,6 +272,43 @@ func UpdateData(data interface{}) (sql.Result, error) {
 
 	dbms := goqu.New(dbType, Dbo)
 	ds := dbms.Update(TableName).Set(data).Where(whereEXP)
+	sql, args, _ := ds.ToSQL()
+	log.Println(sql, args)
+
+	result, err := Dbo.Exec(sql)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// UpdateDataMAP - crUd
+func UpdateDataMAP(data interface{}) (sql.Result, error) {
+	whereEXP := goqu.Ex{}
+	record := goqu.Record{}
+	if data != nil {
+		jsonBody, ok := gjson.Parse(string(data.([]byte))).Value().(map[string]interface{})
+		if !ok {
+			log.Println("Cannot parse jsonBody")
+		}
+
+		for k, v := range jsonBody {
+			record[k] = v
+
+			if funk.Contains(UpdateScope, k) {
+				whereEXP[k] = goqu.Op{"eq": v}
+			}
+		}
+	}
+
+	dbType, err := getDialect()
+	if err != nil {
+		log.Println("ERR Select DBType: ", err)
+	}
+
+	dbms := goqu.New(dbType, Dbo)
+	ds := dbms.Update(TableName).Set(record).Where(whereEXP)
 	sql, args, _ := ds.ToSQL()
 	log.Println(sql, args)
 

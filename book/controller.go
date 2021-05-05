@@ -39,6 +39,26 @@ func AddBooks(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
+// AddBooksMAP - Insert book(s) info
+func AddBooksMAP(c echo.Context) error {
+	books, _ := ioutil.ReadAll(c.Request().Body)
+
+	sqlResult, err := db.InsertDataMAP(books)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"msg": err.Error()})
+	}
+
+	lastID, _ := sqlResult.LastInsertId()
+	affRows, _ := sqlResult.RowsAffected()
+
+	result := map[string]string{
+		"last-id":       fmt.Sprint(lastID),
+		"affected-rows": fmt.Sprint(affRows),
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
 // GetBook - Get a book info
 func GetBook(c echo.Context) error {
 	idx := c.Param("idx")
@@ -52,7 +72,7 @@ func GetBook(c echo.Context) error {
 	if dataINTF != nil {
 		data = dataINTF.([]models.Book)
 	} else {
-		log.Println("Control WTF null")
+		log.Println("Null data")
 	}
 	// data, err = db.SelectData(models.Book{})
 	// if err != nil {
@@ -74,7 +94,7 @@ func GetBooks(c echo.Context) error {
 	if dataINTF != nil {
 		data = dataINTF.([]models.Book)
 	} else {
-		log.Println("Control WTF null")
+		log.Println("Null data")
 	}
 
 	return c.JSON(http.StatusOK, data)
@@ -110,7 +130,7 @@ func SearchBooks(c echo.Context) error {
 	if dataINTF != nil {
 		data = dataINTF.([]models.Book)
 	} else {
-		log.Println("Control WTF null")
+		log.Println("Null data")
 	}
 
 	return c.JSON(http.StatusOK, data)
@@ -142,6 +162,26 @@ func EditBook(c echo.Context) error {
 	}
 
 	sqlResult, err := db.UpdateData(book)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"msg": err.Error()})
+	}
+
+	lastID, _ := sqlResult.LastInsertId()
+	affRows, _ := sqlResult.RowsAffected()
+
+	result := map[string]string{
+		"last-id":       fmt.Sprint(lastID),
+		"affected-rows": fmt.Sprint(affRows),
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
+// EditBookMAP - Edit book info
+func EditBookMAP(c echo.Context) error {
+	book, _ := ioutil.ReadAll(c.Request().Body)
+
+	sqlResult, err := db.UpdateDataMAP(book)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"msg": err.Error()})
 	}
