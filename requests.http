@@ -8,9 +8,6 @@ GET {{uri}}/book/1 HTTP/1.1
 ### Select All - Limit 10
 GET {{uri}}/books HTTP/1.1
 
-### Select All - Map
-GET {{uri}}/boards-map HTTP/1.1
-
 
 ### Select Data No paging, no search. listCount of /db/db.go: 3
 POST {{uri}}/books HTTP/1.1
@@ -68,30 +65,6 @@ content-type: application/json
     }
 }
 
-### Search MAP
-### keywords -> board{name and author and price ...} or board{name and author and price} ...
-### Use and inside board, use or each boards
-POST {{uri}}/boards-map HTTP/1.1
-content-type: application/json
-
-{
-    "keywords": [
-        {
-            "author": "Carl Edward Sagan"
-        },
-        {
-            "author": "김용"
-        },
-        {
-            "name": "흔한남매 7",
-            "author": "백난도"
-        }
-    ],
-    "options": {
-        "page": 0,
-        "count": 3
-    }
-}
 
 ### Add book #1
 PUT {{uri}}/books HTTP/1.1

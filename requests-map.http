@@ -1,0 +1,31 @@
+@uri=http://localhost:2918
+
+
+### Select All - Map
+GET {{uri}}/boards-map HTTP/1.1
+
+
+### Search MAP
+### keywords -> board{name and author and price ...} or board{name and author and price} ...
+### Use and inside board, use or each boards
+POST {{uri}}/boards-map HTTP/1.1
+content-type: application/json
+
+{
+    "keywords": [
+        {
+            "author": "Carl Edward Sagan"
+        },
+        {
+            "author": "김용"
+        },
+        {
+            "name": "흔한남매 7",
+            "author": "백난도"
+        }
+    ],
+    "options": {
+        "page": 0,
+        "count": 3
+    }
+}
