@@ -262,6 +262,8 @@ func SelectDataMAP(search interface{}) (interface{}, error) {
 				m[colName] = string([]byte((*val).([]uint8)))
 			case int64:
 				m[colName] = (*val).(int64)
+			case float64:
+				m[colName] = (*val).(float64)
 			}
 		}
 
