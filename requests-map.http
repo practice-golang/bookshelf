@@ -14,14 +14,14 @@ content-type: application/json
 {
     "keywords": [
         {
-            "author": "Carl Edward Sagan"
+            "AUTHOR": "Carl Edward Sagan"
         },
         {
-            "author": "김용"
+            "AUTHOR": "김용"
         },
         {
-            "name": "흔한남매 7",
-            "author": "백난도"
+            "NAME": "흔한남매 7",
+            "AUTHOR": "백난도"
         }
     ],
     "options": {
@@ -37,52 +37,52 @@ content-type: application/json
 
 [
     {
-        "name": "The Quick and Easy Way to Effective Speaking",
-        "price": "10.99",
-        "author": "Dale Carnegie",
-        "isbn": "9780671724009"
+        "NAME": "The Quick and Easy Way to Effective Speaking",
+        "PRICE": "10.99",
+        "AUTHOR": "Dale Carnegie",
+        "ISBN": "9780671724009"
     },
     {
-        "name": "Beyond Order: 12 More Rules for Life",
-        "price": "31.95",
-        "author": "Jordan B. Peterson",
-        "isbn": "9780593084649"
+        "NAME": "Beyond Order: 12 More Rules for Life",
+        "PRICE": "31.95",
+        "AUTHOR": "Jordan B. Peterson",
+        "ISBN": "9780593084649"
     },
     {
-        "name": "흔한남매 7",
-        "price": "10800",
-        "author": "백난도",
-        "isbn": "9791164137527"
+        "NAME": "흔한남매 7",
+        "PRICE": "10800",
+        "AUTHOR": "백난도",
+        "ISBN": "9791164137527"
     },
     {
-        "name": "Cosmos",
-        "price": "19.05",
-        "author": "Carl Edward Sagan",
-        "isbn": "9780375508325"
+        "NAME": "Cosmos",
+        "PRICE": "19.05",
+        "AUTHOR": "Carl Edward Sagan",
+        "ISBN": "9780375508325"
     },
     {
-        "name": "사조영웅전",
-        "price": "65000",
-        "author": "김용",
-        "isbn": "9788934987475"
+        "NAME": "사조영웅전",
+        "PRICE": "65000",
+        "AUTHOR": "김용",
+        "ISBN": "9788934987475"
     },
     {
-        "name": "신조협려",
-        "price": "102400",
-        "author": "김용",
-        "isbn": "9788934985808"
+        "NAME": "신조협려",
+        "PRICE": "102400",
+        "AUTHOR": "김용",
+        "ISBN": "9788934985808"
     },
     {
-        "name": "주택과 세금",
-        "price": "7000",
-        "author": "국세청",
-        "isbn": "9791163060390"
+        "NAME": "주택과 세금",
+        "PRICE": "7000",
+        "AUTHOR": "국세청",
+        "ISBN": "9791163060390"
     },
     {
-        "name": "PSPICE for Circuit Theory and Electronic Devices",
-        "price": "57000",
-        "author": "Tobin, Paul",
-        "isbn": "9781598291568"
+        "NAME": "PSPICE for Circuit Theory and Electronic Devices",
+        "PRICE": "57000",
+        "AUTHOR": "Tobin, Paul",
+        "ISBN": "9781598291568"
     }
 ]
 
@@ -91,9 +91,9 @@ PATCH {{uri}}/book-map HTTP/1.1
 content-type: application/json
 
 {
-    "idx": "2",
-    "name": "Batman: The Dark Knight Returns",
-    "author": "Frank Miller",
-    "price": "17.33",
-    "isbn": "9781563893421"
+    "IDX": "2",
+    "NAME": "aBatman: The Dark Knight Returns",
+    "AUTHOR": "Frank Miller",
+    "PRICE": "17.33",
+    "ISBN": "9781563893421"
 }
