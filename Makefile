@@ -1,7 +1,7 @@
 build:
 	go build -o bin/
 
-vendor:
+modvendor:
 	go build -mod=vendor -o bin/
 
 clean:
