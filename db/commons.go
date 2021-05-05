@@ -7,6 +7,7 @@ import (
 	"log"
 
 	"github.com/practice-golang/bookshelf/models"
+	"github.com/tidwall/gjson"
 
 	"github.com/doug-martin/goqu/v9"
 	_ "github.com/doug-martin/goqu/v9/dialect/mysql"
@@ -126,6 +127,96 @@ func SelectData(search interface{}) (interface{}, error) {
 	}
 
 	return result, nil
+}
+
+// SelectDataMAP - cRud MAP
+func SelectDataMAP(search interface{}) (interface{}, error) {
+	var result []map[string]interface{}
+	var err error
+
+	offset := uint(0)
+	count := listCount
+
+	dbType, err := getDialect()
+	if err != nil {
+		log.Println("ERR Select DBType: ", err)
+	}
+
+	colNames := []interface{}{"NAME", "AUTHOR"}
+	colNames = append(colNames, "IDX")
+	colNames = append(colNames, "PRICE")
+	colNames = append(colNames, "ISBN")
+	dbms := goqu.New(dbType, Dbo)
+	ds := dbms.From(TableName).Select(colNames...)
+
+	exps := []goqu.Expression{}
+	if search != nil {
+		jsonBody, ok := gjson.Parse(string(search.([]byte))).Value().(map[string]interface{})
+		if !ok {
+			log.Println("Cannot parse jsonBody")
+		}
+
+		for i, kwds := range jsonBody["keywords"].([]interface{}) {
+			log.Println("Keywords: ", i, kwds)
+			ex := goqu.Ex{}
+
+			for k, v := range kwds.(map[string]interface{}) {
+				ex[k] = goqu.Op{"like": v}
+			}
+			if !ex.IsEmpty() {
+				exps = append(exps, ex.Expression())
+			}
+		}
+
+		if jsonBody["options"] != nil {
+			if jsonBody["options"].(map[string]interface{})["count"] != nil {
+				count = uint(jsonBody["options"].(map[string]interface{})["count"].(float64))
+			}
+
+			if jsonBody["options"].(map[string]interface{})["page"] != nil {
+				offset = uint(jsonBody["options"].(map[string]interface{})["page"].(float64))
+			}
+		}
+	}
+
+	ds = ds.Where(goqu.Or(exps...))
+
+	cnt := uint(count)
+	ds = ds.Limit(cnt)
+
+	ds = ds.Offset(offset * cnt)
+
+	sql, args, _ := ds.ToSQL()
+	log.Println(sql, args)
+
+	rows, err := Dbo.Query(sql, args...)
+	if err != nil {
+		log.Println("rowsMAP: ", err.Error())
+		return nil, err
+	}
+	cols, _ := rows.Columns()
+
+	for rows.Next() {
+		columns := make([]interface{}, len(cols))
+		colPtrs := make([]interface{}, len(cols))
+		for i := range columns {
+			colPtrs[i] = &columns[i]
+		}
+
+		if err := rows.Scan(colPtrs...); err != nil {
+			return nil, err
+		}
+
+		m := make(map[string]interface{})
+		for i, colName := range cols {
+			val := colPtrs[i].(*interface{})
+			m[colName] = *val
+		}
+
+		result = append(result, m)
+	}
+
+	return result, err
 }
 
 // UpdateData - crUd

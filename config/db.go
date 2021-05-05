@@ -1,4 +1,4 @@
-package consts
+package config
 
 type DBpath struct {
 	Type     string

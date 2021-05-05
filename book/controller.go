@@ -2,6 +2,7 @@ package book
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"math"
 	"net/http"
@@ -79,6 +80,19 @@ func GetBooks(c echo.Context) error {
 	return c.JSON(http.StatusOK, data)
 }
 
+// GetBooksMAP - Get all(but limit 10 by db.SelectData) boards info to map
+func GetBooksMAP(c echo.Context) error {
+	var data interface{}
+	var err error
+
+	data, err = db.SelectDataMAP(nil)
+	if err != nil {
+		log.Fatal("SelectDataMAP: ", err)
+	}
+
+	return c.JSON(http.StatusOK, data)
+}
+
 // SearchBooks - Search book(s) info or paging
 func SearchBooks(c echo.Context) error {
 	var data []models.Book
@@ -97,6 +111,23 @@ func SearchBooks(c echo.Context) error {
 		data = dataINTF.([]models.Book)
 	} else {
 		log.Println("Control WTF null")
+	}
+
+	return c.JSON(http.StatusOK, data)
+}
+
+// SearchBooksMAP - Search board(s) info or paging
+func SearchBooksMAP(c echo.Context) error {
+	var data interface{}
+	// var search interface{}
+	// var search models.BoardSearch
+	var err error
+
+	search, _ := ioutil.ReadAll(c.Request().Body)
+
+	data, err = db.SelectDataMAP(search)
+	if err != nil {
+		log.Fatal("SelectDataMAP: ", err)
 	}
 
 	return c.JSON(http.StatusOK, data)

@@ -18,7 +18,7 @@ import (
 	_ "modernc.org/sqlite"
 
 	"github.com/practice-golang/bookshelf/book"
-	"github.com/practice-golang/bookshelf/consts"
+	"github.com/practice-golang/bookshelf/config"
 	"github.com/practice-golang/bookshelf/db"
 )
 
@@ -31,9 +31,9 @@ var (
 
 func setupDB() error {
 	var err error
-	info := consts.DbInfo
+	info := config.DbInfo
 
-	switch consts.DbInfo.Type {
+	switch config.DbInfo.Type {
 	case "sqlite":
 		db.DBType = db.SQLITE
 		db.Dsn = info.Filename
@@ -134,6 +134,9 @@ func setupServer() *echo.Echo {
 	e.PATCH("/book", book.EditBook)
 	e.DELETE("/book/:idx", book.DeleteBook)
 
+	e.GET("/boards-map", book.GetBooksMAP)
+	e.POST("/boards-map", book.SearchBooksMAP)
+
 	e.POST("/total-page", book.GetTotalPage)
 
 	return e
@@ -161,14 +164,14 @@ func main() {
 	}
 
 	if cfg != nil {
-		consts.DbInfo.Type = cfg.Section("database").Key("DBTYPE").String()
-		consts.DbInfo.Server = cfg.Section("database").Key("ADDRESS").String()
-		consts.DbInfo.Port, _ = cfg.Section("database").Key("PORT").Int()
-		consts.DbInfo.User = cfg.Section("database").Key("USER").String()
-		consts.DbInfo.Password = cfg.Section("database").Key("PASSWORD").String()
-		consts.DbInfo.Database = cfg.Section("database").Key("DATABASE").String()
-		consts.DbInfo.Schema = cfg.Section("database").Key("SCHEMA").String()
-		consts.DbInfo.Filename = cfg.Section("database").Key("FILENAME").String()
+		config.DbInfo.Type = cfg.Section("database").Key("DBTYPE").String()
+		config.DbInfo.Server = cfg.Section("database").Key("ADDRESS").String()
+		config.DbInfo.Port, _ = cfg.Section("database").Key("PORT").Int()
+		config.DbInfo.User = cfg.Section("database").Key("USER").String()
+		config.DbInfo.Password = cfg.Section("database").Key("PASSWORD").String()
+		config.DbInfo.Database = cfg.Section("database").Key("DATABASE").String()
+		config.DbInfo.Schema = cfg.Section("database").Key("SCHEMA").String()
+		config.DbInfo.Filename = cfg.Section("database").Key("FILENAME").String()
 	}
 
 	var fileConnectionLog *os.File
@@ -212,6 +215,6 @@ func main() {
 
 	e.Use(middleware.BodyDump(dumpHandler))
 
-	// e.Logger.Fatal(e.Start(":2918"))
-	e.Logger.Fatal(e.Start("127.0.0.1:2918"))
+	e.Logger.Fatal(e.Start(":2918"))
+	// e.Logger.Fatal(e.Start("127.0.0.1:2918"))
 }
