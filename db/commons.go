@@ -251,9 +251,8 @@ func SelectDataMAP(search interface{}) (interface{}, error) {
 		m := make(map[string]interface{})
 		for i, colName := range cols {
 			val := colPtrs[i].(*interface{})
-			switch t := (*val).(type) {
+			switch (*val).(type) {
 			case string:
-				log.Println(t)
 				m[colName] = (*val).(string)
 			case uint8:
 				m[colName] = (*val).(uint8)
