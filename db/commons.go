@@ -195,15 +195,17 @@ func SelectDataMAP(search interface{}) (interface{}, error) {
 			log.Println("Cannot parse jsonBody")
 		}
 
-		for i, kwds := range jsonBody["keywords"].([]interface{}) {
-			log.Println("Keywords: ", i, kwds)
-			ex := goqu.Ex{}
+		if jsonBody["keywords"] != nil {
+			for i, kwds := range jsonBody["keywords"].([]interface{}) {
+				log.Println("Keywords: ", i, kwds)
+				ex := goqu.Ex{}
 
-			for k, v := range kwds.(map[string]interface{}) {
-				ex[k] = goqu.Op{"like": v}
-			}
-			if !ex.IsEmpty() {
-				exps = append(exps, ex.Expression())
+				for k, v := range kwds.(map[string]interface{}) {
+					ex[k] = goqu.Op{"like": v}
+				}
+				if !ex.IsEmpty() {
+					exps = append(exps, ex.Expression())
+				}
 			}
 		}
 
