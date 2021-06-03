@@ -13,8 +13,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
-	"gopkg.in/ini.v1"
-
 	_ "modernc.org/sqlite"
 
 	"github.com/practice-golang/bookshelf/book"
@@ -25,8 +23,7 @@ import (
 var (
 	//go:embed static
 	content embed.FS
-	//go:embed samples/bookshelf.ini
-	sampleINI string
+	// ----go:embed samples/bookshelf.ini// sampleINI string
 )
 
 func setupDB() error {
@@ -147,35 +144,35 @@ func setupServer() *echo.Echo {
 func Handler(w http.ResponseWriter, r *http.Request) {
 	// func main() {
 	var err error
-	cfg, err := ini.Load("bookshelf.ini")
+	// cfg, err := ini.Load("bookshelf.ini")
 
-	if err != nil {
-		log.Print("Fail to read ini. ")
+	// if err != nil {
+	// 	log.Print("Fail to read ini. ")
 
-		f, err := os.Create("bookshelf.ini")
-		if err != nil {
-			log.Fatal("Create INI: ", err)
-		}
-		defer f.Close()
+	// 	f, err := os.Create("bookshelf.ini")
+	// 	if err != nil {
+	// 		log.Fatal("Create INI: ", err)
+	// 	}
+	// 	defer f.Close()
 
-		_, err = f.WriteString(sampleINI + "\n")
-		if err != nil {
-			log.Fatal("Create INI: ", err)
-		}
+	// 	_, err = f.WriteString(sampleINI + "\n")
+	// 	if err != nil {
+	// 		log.Fatal("Create INI: ", err)
+	// 	}
 
-		log.Println("bookshelf.ini is created")
-	}
+	// 	log.Println("bookshelf.ini is created")
+	// }
 
-	if cfg != nil {
-		config.DbInfo.Type = cfg.Section("database").Key("DBTYPE").String()
-		config.DbInfo.Server = cfg.Section("database").Key("ADDRESS").String()
-		config.DbInfo.Port, _ = cfg.Section("database").Key("PORT").Int()
-		config.DbInfo.User = cfg.Section("database").Key("USER").String()
-		config.DbInfo.Password = cfg.Section("database").Key("PASSWORD").String()
-		config.DbInfo.Database = cfg.Section("database").Key("DATABASE").String()
-		config.DbInfo.Schema = cfg.Section("database").Key("SCHEMA").String()
-		config.DbInfo.Filename = cfg.Section("database").Key("FILENAME").String()
-	}
+	// if cfg != nil {
+	// 	config.DbInfo.Type = cfg.Section("database").Key("DBTYPE").String()
+	// 	config.DbInfo.Server = cfg.Section("database").Key("ADDRESS").String()
+	// 	config.DbInfo.Port, _ = cfg.Section("database").Key("PORT").Int()
+	// 	config.DbInfo.User = cfg.Section("database").Key("USER").String()
+	// 	config.DbInfo.Password = cfg.Section("database").Key("PASSWORD").String()
+	// 	config.DbInfo.Database = cfg.Section("database").Key("DATABASE").String()
+	// 	config.DbInfo.Schema = cfg.Section("database").Key("SCHEMA").String()
+	// 	config.DbInfo.Filename = cfg.Section("database").Key("FILENAME").String()
+	// }
 
 	var fileConnectionLog *os.File
 
