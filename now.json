@@ -1,0 +1,7 @@
+{
+  "name": "bookshelf",
+  "version": 1,
+  "routes": [
+    { "src": "/.*", "dest": "api/index.go" }
+  ]
+}
