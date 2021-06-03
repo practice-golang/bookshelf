@@ -144,7 +144,8 @@ func setupServer() *echo.Echo {
 	return e
 }
 
-func main() {
+func Handler(w http.ResponseWriter, r *http.Request) {
+	// func main() {
 	var err error
 	cfg, err := ini.Load("bookshelf.ini")
 
@@ -217,6 +218,8 @@ func main() {
 
 	e.Use(middleware.BodyDump(dumpHandler))
 
-	e.Logger.Fatal(e.Start(":2918"))
+	e.ServeHTTP(w, r)
+
+	// e.Logger.Fatal(e.Start(":2918"))
 	// e.Logger.Fatal(e.Start("127.0.0.1:2918"))
 }
