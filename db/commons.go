@@ -45,6 +45,19 @@ func InsertData(data interface{}) (sql.Result, error) {
 
 	dbms := goqu.New(dbType, Dbo)
 	ds := dbms.Insert(TableName).Rows(data)
+
+	// if dbType == "postgres" {
+	// 	ds = ds.Returning("IDX")
+	// 	sql, args, _ := ds.ToSQL()
+	// 	var idx int64
+	// 	pr, err := dbms.ScanVal(&idx, sql, args...)
+	// 	if err != nil {
+	// 		log.Println("InsertData pgsql error: ", err.Error())
+	// 	}
+
+	// 	log.Println("InsertData pgsql idx: ", pr, idx)
+	// }
+
 	sql, args, _ := ds.ToSQL()
 	log.Println(sql, args)
 
