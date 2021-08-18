@@ -46,22 +46,35 @@ func InsertData(data interface{}) (sql.Result, error) {
 	dbms := goqu.New(dbType, Dbo)
 	ds := dbms.Insert(TableName).Rows(data)
 
+	var result sql.Result
+
 	// if dbType == "postgres" {
 	// 	ds = ds.Returning("IDX")
 	// 	sql, args, _ := ds.ToSQL()
 	// 	var idx int64
-	// 	pr, err := dbms.ScanVal(&idx, sql, args...)
+	// 	// pr, err := dbms.ScanVal(&idx, sql, args...)
+	// 	// log.Println("InsertData pgsql idx: ", pr, idx)
+	// 	rows, err := Dbo.Query(sql, args...)
 	// 	if err != nil {
 	// 		log.Println("InsertData pgsql error: ", err.Error())
 	// 	}
 
-	// 	log.Println("InsertData pgsql idx: ", pr, idx)
+	// 	var idxs []int64
+	// 	for rows.Next() {
+	// 		_ = rows.Scan(&idx)
+	// 		log.Println("InsertData pgsql idx: ", idx)
+	// 		idxs = append(idxs, idx)
+	// 	}
+
+	// 	log.Println("InsertData pgsql idx length: ", len(idxs))
+
+	// } else {
 	// }
 
 	sql, args, _ := ds.ToSQL()
 	log.Println(sql, args)
 
-	result, err := Dbo.Exec(sql)
+	result, err = Dbo.Exec(sql)
 	if err != nil {
 		return nil, err
 	}
